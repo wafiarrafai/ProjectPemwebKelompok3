@@ -1,0 +1,238 @@
+
+/* =====================================
+   SEHATIN - DETAIL KELUHAN
+===================================== */
+
+/* CONTENT GRID */
+.detail-content-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2.5fr) minmax(190px, 1fr);
+    align-items: start;
+    gap: 16px;
+}
+
+
+/* =====================================
+   COMPLAINT CARD
+===================================== */
+
+.detail-complaint-card {
+    background: #fff;
+    border: 1px solid #e6eeea;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 3px 12px rgba(31, 72, 59, 0.025);
+}
+
+
+/* CARD HEADING */
+.detail-card-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.detail-card-heading h2 {
+    color: #29473f;
+    font-size: 19px;
+    font-weight: 700;
+}
+
+
+/* METADATA */
+.detail-metadata {
+    color: #82938b;
+    font-size: 10px;
+    line-height: 1.7;
+    margin-bottom: 17px;
+}
+
+
+/* DESCRIPTION */
+.detail-section {
+    padding-bottom: 17px;
+    border-bottom: 1px solid #edf1ee;
+}
+
+.detail-section h3,
+.detail-followup h3 {
+    color: #304a42;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.detail-section p {
+    color: #526b61;
+    font-size: 12px;
+    line-height: 1.8;
+}
+
+
+/* FOLLOW UP */
+.detail-followup {
+    padding-top: 17px;
+}
+
+.detail-followup p {
+    color: #899a91;
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+
+/* BACK BUTTON */
+.detail-actions {
+    margin-top: 17px;
+}
+
+.detail-back-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 37px;
+    padding: 0 13px;
+    border: 1px solid #dfe9e3;
+    border-radius: 7px;
+    color: #315d52;
+    background: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    transition: 0.2s;
+}
+
+.detail-back-button:hover {
+    background: #edf7f3;
+    color: #168c7d;
+}
+
+
+/* =====================================
+   STATUS PROGRESS CARD
+===================================== */
+
+.detail-progress-card {
+    background: #fff;
+    border: 1px solid #e6eeea;
+    border-radius: 12px;
+    padding: 18px;
+    box-shadow: 0 3px 12px rgba(31, 72, 59, 0.025);
+}
+
+.detail-progress-card h2 {
+    color: #304a42;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+
+
+/* PROGRESS ITEM */
+.detail-progress-item {
+    margin-bottom: 14px;
+}
+
+.detail-progress-item:last-child {
+    margin-bottom: 0;
+}
+
+.detail-progress-item .history-status {
+    display: inline-block;
+    margin-bottom: 7px;
+}
+
+.detail-progress-item p {
+    color: #899a91;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+
+/* =====================================
+   NOT FOUND
+===================================== */
+
+.detail-not-found {
+    background: #fff;
+    border: 1px solid #e6eeea;
+    border-radius: 12px;
+    padding: 35px;
+    text-align: center;
+}
+
+.detail-not-found h2 {
+    color: #29473f;
+    font-size: 17px;
+    margin-bottom: 10px;
+}
+
+.detail-not-found p {
+    color: #899a91;
+    font-size: 12px;
+    margin-bottom: 18px;
+}
+
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+@media (max-width: 900px) {
+
+    .detail-content-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .detail-progress-card {
+        max-width: none;
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .detail-complaint-card {
+        padding: 17px;
+    }
+
+    .detail-card-heading {
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .detail-card-heading h2 {
+        font-size: 17px;
+    }
+
+    .detail-progress-card {
+        padding: 17px;
+    }
+
+}
+
+.detail-complaint-card .history-status,
+.detail-progress-card .history-status {
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.history-status.waiting {
+    background: #fff0d4;
+    color: #a87927;
+}
+
+.history-status.processing {
+    background: #edf0f2;
+    color: #6d7d84;
+}
+
+.history-status.completed {
+    background: #dcf4e5;
+    color: #278552;
+}

@@ -1,0 +1,323 @@
+
+/* =====================================
+   SEHATIN - ADMIN COMPLAINTS
+===================================== */
+
+.admin-complaints-main {
+    padding: 30px 35px;
+    min-width: 0;
+}
+
+
+/* =====================================
+   HEADER
+===================================== */
+
+.complaints-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.complaints-header h1 {
+    color: #203e37;
+    font-size: 25px;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+.complaints-header p {
+    color: #87978f;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+
+/* DOWNLOAD BUTTON */
+.complaints-download-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 105px;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1px solid #e1eae5;
+    border-radius: 7px;
+    color: #49675d;
+    font-size: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+.complaints-download-button:hover {
+    background: #edf7f3;
+    border-color: #168c7d;
+    color: #168c7d;
+}
+
+
+/* =====================================
+   SEARCH AND FILTER
+===================================== */
+
+.complaints-search-section {
+    margin-bottom: 24px;
+}
+
+.complaints-search-section label {
+    display: block;
+    color: #304a42;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.complaints-search-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 95px 85px;
+    gap: 9px;
+}
+
+.complaints-search-controls input,
+.complaints-search-controls select {
+    width: 100%;
+    height: 35px;
+    padding: 0 11px;
+    background: #fff;
+    border: 1px solid #e1eae5;
+    border-radius: 6px;
+    outline: none;
+    color: #526b61;
+    font-family: inherit;
+    font-size: 10px;
+}
+
+.complaints-search-controls input::placeholder {
+    color: #a5b1aa;
+}
+
+.complaints-search-controls input:focus,
+.complaints-search-controls select:focus {
+    border-color: #168c7d;
+}
+
+.complaints-search-controls select {
+    cursor: pointer;
+}
+
+.complaints-search-button {
+    display: none;
+}
+
+
+/* =====================================
+   TABLE CARD
+===================================== */
+
+.complaints-table-card {
+    background: #fff;
+    border: 1px solid #e6eeea;
+    border-radius: 12px;
+    padding: 10px 17px;
+    box-shadow: 0 3px 12px rgba(31, 72, 59, 0.025);
+}
+
+.complaints-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.complaints-table {
+    width: 100%;
+    min-width: 580px;
+    border-collapse: collapse;
+}
+
+
+/* TABLE HEADER */
+.complaints-table thead th {
+    padding: 13px 10px;
+    border-bottom: 1px solid #edf1ee;
+    color: #82938b;
+    font-size: 9px;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+}
+
+
+/* TABLE BODY */
+.complaints-table tbody td {
+    height: 78px;
+    padding: 13px 10px;
+    border-bottom: 1px solid #edf1ee;
+    font-size: 10px;
+}
+
+.complaints-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* COMPLAINT TITLE */
+.complaint-title-cell {
+    width: 34%;
+}
+
+.complaint-title-cell strong {
+    display: block;
+    color: #29473f;
+    font-size: 10px;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.complaint-title-cell small {
+    display: block;
+    color: #82938b;
+    font-size: 9px;
+}
+
+
+/* CATEGORY */
+.complaint-category-cell {
+    width: 22%;
+    color: #82938b;
+    font-size: 10px;
+}
+
+
+/* DATE */
+.complaint-date-cell {
+    width: 17%;
+    color: #82938b;
+    white-space: nowrap;
+}
+
+
+/* =====================================
+   STATUS BADGES
+===================================== */
+
+.complaint-status {
+    display: inline-block;
+    padding: 6px 9px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.complaint-status.waiting {
+    background: #fff0d4;
+    color: #a87927;
+}
+
+.complaint-status.processing {
+    background: #edf0f2;
+    color: #6d7d84;
+}
+
+.complaint-status.completed {
+    background: #dcf4e5;
+    color: #278552;
+}
+
+
+/* =====================================
+   REVIEW BUTTON
+===================================== */
+
+.complaint-review-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    min-width: 53px;
+    padding: 7px 10px;
+    border: 1px solid #dfe9e3;
+    border-radius: 6px;
+    color: #315b50;
+    font-size: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.complaint-review-button:hover {
+    background: #edf7f3;
+    border-color: #168c7d;
+    color: #168c7d;
+}
+
+
+/* EMPTY STATE */
+.complaints-empty {
+    padding: 35px 15px !important;
+    text-align: center;
+    color: #96a49c;
+    font-size: 11px !important;
+}
+
+
+/* =====================================
+   FOOTER
+===================================== */
+
+.admin-complaints-main .admin-footer {
+    margin-top: 30px;
+}
+
+
+/* =====================================
+   TABLET
+===================================== */
+
+@media (max-width: 900px) {
+
+    .admin-complaints-main {
+        padding: 25px 20px;
+    }
+
+    .complaints-header h1 {
+        font-size: 22px;
+    }
+
+}
+
+
+/* =====================================
+   MOBILE
+===================================== */
+
+@media (max-width: 600px) {
+
+    .admin-complaints-main {
+        padding: 22px 15px;
+    }
+
+    .complaints-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .complaints-header h1 {
+        font-size: 21px;
+    }
+
+    .complaints-search-controls {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .complaints-search-controls input {
+        grid-column: 1 / -1;
+    }
+
+    .complaints-table-card {
+        padding: 8px;
+    }
+
+}

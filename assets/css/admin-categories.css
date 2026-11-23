@@ -1,0 +1,400 @@
+
+/* =====================================
+   SEHATIN - ADMIN CATEGORIES
+===================================== */
+
+.admin-categories-main {
+    padding: 30px 35px;
+    min-width: 0;
+}
+
+
+/* =====================================
+   HEADER
+===================================== */
+
+.categories-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.categories-header h1 {
+    color: #203e37;
+    font-size: 25px;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+.categories-header p {
+    color: #87978f;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+
+/* ADD BUTTON */
+.categories-add-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 11px 15px;
+    background: #168c7d;
+    color: #fff;
+    border-radius: 7px;
+    font-size: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+.categories-add-button:hover {
+    background: #106f63;
+}
+
+
+/* =====================================
+   SEARCH
+===================================== */
+
+.categories-search-section {
+    margin-bottom: 20px;
+}
+
+.categories-search-section label {
+    display: block;
+    color: #304a42;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.categories-search-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 75px;
+    gap: 10px;
+}
+
+.categories-search-controls input {
+    width: 100%;
+    height: 36px;
+    padding: 0 11px;
+    background: #fff;
+    border: 1px solid #e1eae5;
+    border-radius: 6px;
+    color: #526b61;
+    font-family: inherit;
+    font-size: 10px;
+    outline: none;
+}
+
+.categories-search-controls input::placeholder {
+    color: #a5b1aa;
+}
+
+.categories-search-controls input:focus {
+    border-color: #168c7d;
+}
+
+.categories-search-controls button {
+    background: #fff;
+    border: 1px solid #e1eae5;
+    border-radius: 6px;
+    color: #315b50;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.categories-search-controls button:hover {
+    background: #edf7f3;
+    border-color: #168c7d;
+}
+
+
+/* =====================================
+   SUMMARY
+===================================== */
+
+.categories-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 13px;
+    margin-bottom: 20px;
+}
+
+.category-summary-card {
+    background: #fff;
+    border: 1px solid #e6eeea;
+    border-radius: 10px;
+    padding: 15px;
+    min-height: 95px;
+}
+
+.category-summary-card span {
+    display: block;
+    color: #82938b;
+    font-size: 10px;
+    margin-bottom: 8px;
+}
+
+.category-summary-card h2 {
+    color: #168c7d;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.category-summary-card p {
+    color: #9aa8a1;
+    font-size: 10px;
+}
+
+
+/* =====================================
+   TABLE CARD
+===================================== */
+
+.categories-table-card {
+    background: #fff;
+    border: 1px solid #e6eeea;
+    border-radius: 12px;
+    padding: 17px;
+    box-shadow: 0 3px 12px rgba(31, 72, 59, 0.025);
+}
+
+
+/* TABLE HEADING */
+.categories-table-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.categories-table-heading h2 {
+    color: #29473f;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.categories-table-heading span {
+    color: #82938b;
+    font-size: 10px;
+}
+
+
+/* TABLE */
+.categories-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.categories-table {
+    width: 100%;
+    min-width: 650px;
+    border-collapse: collapse;
+}
+
+
+/* TABLE HEADER */
+.categories-table thead th {
+    padding: 13px 10px;
+    border-bottom: 1px solid #edf1ee;
+    color: #82938b;
+    font-size: 9px;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+}
+
+
+/* TABLE BODY */
+.categories-table tbody td {
+    padding: 17px 10px;
+    border-bottom: 1px solid #edf1ee;
+    font-size: 10px;
+    vertical-align: middle;
+}
+
+.categories-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* CATEGORY NAME */
+.category-name-cell {
+    width: 22%;
+    color: #29473f;
+    font-size: 11px !important;
+    font-weight: 600;
+}
+
+
+/* DESCRIPTION */
+.category-description-cell {
+    width: 35%;
+    color: #82938b;
+    line-height: 1.6;
+}
+
+
+/* ARTICLE COUNT */
+.category-count-cell {
+    color: #526b61;
+    white-space: nowrap;
+}
+
+
+/* =====================================
+   STATUS
+===================================== */
+
+.category-active-status {
+    display: inline-block;
+    padding: 6px 9px;
+    border-radius: 5px;
+    background: #dcf4e5;
+    color: #278552;
+    font-size: 9px;
+    font-weight: 600;
+}
+
+
+/* =====================================
+   ACTIONS
+===================================== */
+
+.category-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.category-actions form {
+    margin: 0;
+}
+
+.category-edit-button,
+.category-delete-button {
+    display: inline-block;
+    padding: 6px 9px;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.category-edit-button {
+    color: #168c7d;
+}
+
+.category-edit-button:hover {
+    color: #105f55;
+    text-decoration: underline;
+}
+
+.category-delete-button {
+    color: #bd7169;
+}
+
+.category-delete-button:hover {
+    color: #a13f38;
+    text-decoration: underline;
+}
+
+
+/* =====================================
+   EMPTY STATE
+===================================== */
+
+.categories-empty {
+    padding: 35px 15px !important;
+    text-align: center;
+    color: #96a49c;
+    font-size: 11px !important;
+}
+
+
+/* =====================================
+   NOTIFICATION
+===================================== */
+
+.categories-alert {
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    background: #e6f5f0;
+    border: 1px solid #cce9dd;
+    border-radius: 7px;
+    color: #168c7d;
+    font-size: 11px;
+}
+
+
+/* =====================================
+   FOOTER
+===================================== */
+
+.admin-categories-main .admin-footer {
+    margin-top: 30px;
+}
+
+
+/* =====================================
+   TABLET
+===================================== */
+
+@media (max-width: 900px) {
+
+    .admin-categories-main {
+        padding: 25px 20px;
+    }
+
+    .categories-header h1 {
+        font-size: 22px;
+    }
+
+}
+
+
+/* =====================================
+   MOBILE
+===================================== */
+
+@media (max-width: 600px) {
+
+    .admin-categories-main {
+        padding: 22px 15px;
+    }
+
+    .categories-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .categories-header h1 {
+        font-size: 21px;
+    }
+
+    .categories-summary {
+        gap: 9px;
+    }
+
+    .category-summary-card {
+        padding: 12px;
+    }
+
+    .categories-table-card {
+        padding: 12px;
+    }
+
+}

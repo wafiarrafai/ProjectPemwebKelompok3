@@ -1,0 +1,482 @@
+
+/* =====================================
+   SEHATIN - CREATE COMPLAINT
+===================================== */
+
+.complaint-page {
+    margin: 0;
+    background: #f3f8f6;
+    color: #25443d;
+}
+
+.complaint-page * {
+    box-sizing: border-box;
+}
+
+.complaint-page a {
+    text-decoration: none;
+}
+
+
+/* LAYOUT */
+.complaint-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+
+/* =====================================
+   SIDEBAR
+===================================== */
+
+.complaint-sidebar {
+    width: 220px;
+    min-width: 220px;
+    background: #fff;
+    border-right: 1px solid #e8efeb;
+    padding: 28px 20px;
+    display: flex;
+    flex-direction: column;
+}
+
+.complaint-brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #194c45;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 55px;
+}
+
+.complaint-brand-icon {
+    width: 29px;
+    height: 29px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #168c7d;
+    color: #fff;
+    border-radius: 7px;
+    font-size: 14px;
+}
+
+.complaint-sidebar-label {
+    color: #99a8a1;
+    font-size: 10px;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.complaint-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.complaint-nav-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 11px 9px;
+    border-radius: 7px;
+    color: #71847b;
+    font-size: 12px;
+    transition: 0.2s;
+}
+
+.complaint-nav-link span {
+    width: 17px;
+    text-align: center;
+    font-size: 16px;
+}
+
+.complaint-nav-link:hover,
+.complaint-nav-link.active {
+    color: #168c7d;
+    background: #edf7f3;
+}
+
+
+/* SIDEBAR BOTTOM */
+.complaint-sidebar-bottom {
+    margin-top: auto;
+    padding-top: 18px;
+    border-top: 1px solid #edf1ee;
+}
+
+.complaint-sidebar-bottom p {
+    color: #29473f;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.complaint-sidebar-bottom span {
+    color: #9aa8a1;
+    font-size: 10px;
+}
+
+.complaint-sidebar-bottom a {
+    display: block;
+    margin-top: 17px;
+    color: #b56b65;
+    font-size: 11px;
+}
+
+
+/* =====================================
+   MAIN
+===================================== */
+
+.complaint-main {
+    flex: 1;
+    min-width: 0;
+    padding: 32px 38px;
+}
+
+
+/* HEADER */
+.complaint-page-header {
+    margin-bottom: 25px;
+}
+
+.complaint-breadcrumb {
+    display: flex;
+    gap: 7px;
+    color: #99a8a1;
+    font-size: 11px;
+    margin-bottom: 10px;
+}
+
+.complaint-breadcrumb a {
+    color: #99a8a1;
+}
+
+.complaint-breadcrumb a:hover {
+    color: #168c7d;
+}
+
+.complaint-page-header h1 {
+    color: #203e37;
+    font-size: 27px;
+    font-weight: 700;
+    margin-bottom: 8px;
+}
+
+.complaint-page-header > p {
+    color: #87978f;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+
+/* =====================================
+   CONTENT GRID
+===================================== */
+
+.complaint-content-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2.3fr) minmax(210px, 0.9fr);
+    align-items: start;
+    gap: 20px;
+}
+
+
+/* =====================================
+   FORM CARD
+===================================== */
+
+.complaint-form-card {
+    background: #fff;
+    border: 1px solid #e6eeea;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 3px 12px rgba(31, 72, 59, 0.025);
+}
+
+.complaint-form-card form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.complaint-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+}
+
+.complaint-form-group label {
+    color: #304a42;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.complaint-form-group small {
+    color: #8d9b94;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+
+/* INPUT AND SELECT */
+.complaint-form-group input,
+.complaint-form-group select,
+.complaint-form-group textarea {
+    width: 100%;
+    border: 1px solid #dfe8e3;
+    border-radius: 7px;
+    background: #fff;
+    color: #304a42;
+    font-family: inherit;
+    font-size: 12px;
+    outline: none;
+    transition: 0.2s;
+}
+
+.complaint-form-group input,
+.complaint-form-group select {
+    height: 42px;
+    padding: 0 12px;
+}
+
+.complaint-form-group textarea {
+    min-height: 120px;
+    padding: 12px;
+    resize: vertical;
+    line-height: 1.7;
+}
+
+.complaint-form-group input::placeholder,
+.complaint-form-group textarea::placeholder {
+    color: #b0bab5;
+}
+
+.complaint-form-group select:focus,
+.complaint-form-group input:focus,
+.complaint-form-group textarea:focus {
+    border-color: #168c7d;
+    box-shadow: 0 0 0 3px rgba(22, 140, 125, 0.08);
+}
+
+
+/* =====================================
+   CONFIRMATION
+===================================== */
+
+.complaint-confirmation {
+    display: flex;
+    align-items: flex-start;
+    gap: 9px;
+}
+
+.complaint-confirmation input {
+    width: 14px;
+    height: 14px;
+    margin: 1px 0 0;
+    accent-color: #168c7d;
+    cursor: pointer;
+}
+
+.complaint-confirmation label {
+    color: #70847b;
+    font-size: 11px;
+    line-height: 1.5;
+    cursor: pointer;
+}
+
+
+/* =====================================
+   BUTTONS
+===================================== */
+
+.complaint-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.complaint-submit,
+.complaint-cancel {
+    min-height: 40px;
+    padding: 0 19px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 7px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.complaint-submit {
+    border: none;
+    background: #168c7d;
+    color: #fff;
+}
+
+.complaint-submit:hover {
+    background: #106f62;
+}
+
+.complaint-cancel {
+    border: 1px solid #e1eae5;
+    background: #fff;
+    color: #71847b;
+}
+
+.complaint-cancel:hover {
+    background: #f3f8f6;
+}
+
+
+/* =====================================
+   INFORMATION CARD
+===================================== */
+
+.complaint-info-card {
+    background: #fff3d9;
+    border-radius: 11px;
+    padding: 21px;
+    color: #765a27;
+}
+
+.complaint-info-card h2 {
+    color: #966d25;
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 13px;
+}
+
+.complaint-info-card p {
+    color: #826d47;
+    font-size: 11px;
+    line-height: 1.8;
+}
+
+.complaint-info-divider {
+    height: 1px;
+    background: #e8d4a9;
+    margin: 17px 0;
+}
+
+
+/* MESSAGE */
+.complaint-message {
+    padding: 12px 14px;
+    margin-bottom: 18px;
+    background: #edf7f3;
+    border: 1px solid #d5eae0;
+    color: #287566;
+    border-radius: 7px;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+
+/* FOOTER */
+.complaint-footer {
+    margin-top: 35px;
+    padding-top: 18px;
+    border-top: 1px solid #e4ece7;
+}
+
+.complaint-footer p {
+    color: #9aa8a1;
+    font-size: 10px;
+}
+
+
+/* =====================================
+   TABLET
+===================================== */
+
+@media (max-width: 900px) {
+
+    .complaint-sidebar {
+        width: 190px;
+        min-width: 190px;
+        padding: 25px 15px;
+    }
+
+    .complaint-main {
+        padding: 28px 20px;
+    }
+
+    .complaint-content-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .complaint-info-card {
+        max-width: none;
+    }
+
+}
+
+
+/* =====================================
+   MOBILE
+===================================== */
+
+@media (max-width: 600px) {
+
+    .complaint-layout {
+        flex-direction: column;
+    }
+
+    .complaint-sidebar {
+        width: 100%;
+        min-width: 0;
+        padding: 15px;
+        border-right: none;
+        border-bottom: 1px solid #e8efeb;
+    }
+
+    .complaint-brand {
+        margin-bottom: 17px;
+    }
+
+    .complaint-sidebar-menu {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .complaint-sidebar-label {
+        margin-bottom: 10px;
+    }
+
+    .complaint-nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 5px;
+    }
+
+    .complaint-nav-link {
+        padding: 8px;
+        font-size: 10px;
+        gap: 5px;
+    }
+
+    .complaint-sidebar-bottom {
+        display: none;
+    }
+
+    .complaint-main {
+        padding: 24px 15px;
+    }
+
+    .complaint-page-header h1 {
+        font-size: 23px;
+    }
+
+    .complaint-form-card {
+        padding: 18px;
+    }
+
+    .complaint-info-card {
+        padding: 18px;
+    }
+
+}

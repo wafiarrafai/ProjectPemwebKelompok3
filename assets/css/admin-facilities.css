@@ -1,0 +1,423 @@
+
+/* =====================================
+   SEHATIN - ADMIN FACILITIES
+===================================== */
+
+.admin-facilities-main {
+    padding: 30px 35px;
+    min-width: 0;
+}
+
+
+/* =====================================
+   HEADER
+===================================== */
+
+.admin-facilities-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 23px;
+}
+
+.admin-facilities-header h1 {
+    color: #203e37;
+    font-size: 25px;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+.admin-facilities-header p {
+    color: #87978f;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+
+/* ADD BUTTON */
+.facility-add-button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    padding: 11px 15px;
+    background: #168c7d;
+    border: 1px solid #168c7d;
+    border-radius: 7px;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: 0.2s;
+}
+
+.facility-add-button:hover {
+    background: #106f63;
+}
+
+
+/* =====================================
+   SUMMARY
+===================================== */
+
+.admin-facility-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 22px;
+}
+
+.facility-summary-card {
+    min-height: 95px;
+    padding: 15px;
+    background: #fff;
+    border: 1px solid #e6eeea;
+    border-radius: 10px;
+    box-shadow: 0 3px 12px rgba(31, 72, 59, 0.025);
+}
+
+.facility-summary-card span {
+    display: block;
+    color: #82938b;
+    font-size: 10px;
+    margin-bottom: 8px;
+}
+
+.facility-summary-card h2 {
+    color: #168c7d;
+    font-size: 22px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.facility-summary-card p {
+    color: #9aa8a1;
+    font-size: 9px;
+}
+
+
+/* =====================================
+   SEARCH
+===================================== */
+
+.admin-facility-search {
+    margin-bottom: 20px;
+}
+
+.admin-facility-search label {
+    display: block;
+    color: #304a42;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.admin-facility-search-controls {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 140px 70px;
+    gap: 10px;
+}
+
+.admin-facility-search-controls input,
+.admin-facility-search-controls select {
+    width: 100%;
+    height: 36px;
+    padding: 0 11px;
+    background: #fff;
+    border: 1px solid #e1eae5;
+    border-radius: 6px;
+    color: #526b61;
+    font-family: inherit;
+    font-size: 10px;
+    outline: none;
+}
+
+.admin-facility-search-controls input::placeholder {
+    color: #a5b1aa;
+}
+
+.admin-facility-search-controls input:focus,
+.admin-facility-search-controls select:focus {
+    border-color: #168c7d;
+}
+
+.admin-facility-search-controls select {
+    cursor: pointer;
+}
+
+.admin-facility-search-controls button {
+    background: #fff;
+    border: 1px solid #e1eae5;
+    border-radius: 6px;
+    color: #315b50;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.admin-facility-search-controls button:hover {
+    background: #edf7f3;
+    border-color: #168c7d;
+}
+
+
+/* =====================================
+   TABLE CARD
+===================================== */
+
+.admin-facility-table-card {
+    background: #fff;
+    border: 1px solid #e6eeea;
+    border-radius: 12px;
+    padding: 17px;
+    box-shadow: 0 3px 12px rgba(31, 72, 59, 0.025);
+}
+
+.admin-facility-table-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.admin-facility-table-heading h2 {
+    color: #29473f;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.admin-facility-table-heading span {
+    color: #82938b;
+    font-size: 10px;
+}
+
+
+/* =====================================
+   TABLE
+===================================== */
+
+.admin-facility-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.admin-facility-table {
+    width: 100%;
+    min-width: 780px;
+    border-collapse: collapse;
+}
+
+.admin-facility-table thead th {
+    padding: 13px 10px;
+    border-bottom: 1px solid #edf1ee;
+    color: #82938b;
+    font-size: 9px;
+    font-weight: 600;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.admin-facility-table tbody td {
+    padding: 17px 10px;
+    border-bottom: 1px solid #edf1ee;
+    color: #526b61;
+    font-size: 10px;
+    vertical-align: middle;
+}
+
+.admin-facility-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* NAME */
+.facility-name-cell {
+    width: 20%;
+    color: #29473f !important;
+    font-size: 10px !important;
+    font-weight: 600;
+}
+
+
+/* TYPE */
+.facility-type-badge {
+    display: inline-block;
+    padding: 6px 8px;
+    border-radius: 5px;
+    background: #e8f4f1;
+    color: #168c7d;
+    font-size: 9px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+
+/* ADDRESS */
+.facility-address-cell {
+    width: 22%;
+    color: #82938b !important;
+    line-height: 1.6;
+}
+
+
+/* CONTACT */
+.facility-contact-cell {
+    color: #82938b !important;
+    line-height: 1.5;
+}
+
+
+/* =====================================
+   STATUS
+===================================== */
+
+.facility-active-badge {
+    display: inline-block;
+    padding: 6px 9px;
+    border-radius: 5px;
+    background: #dcf4e5;
+    color: #278552;
+    font-size: 9px;
+    font-weight: 600;
+}
+
+
+/* =====================================
+   ACTIONS
+===================================== */
+
+.admin-facility-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.admin-facility-actions form {
+    margin: 0;
+}
+
+.facility-edit-button,
+.facility-delete-button {
+    display: inline-block;
+    padding: 6px 8px;
+    background: transparent;
+    border: none;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.facility-edit-button {
+    color: #168c7d;
+}
+
+.facility-edit-button:hover {
+    color: #105f55;
+    text-decoration: underline;
+}
+
+.facility-delete-button {
+    color: #bd7169;
+}
+
+.facility-delete-button:hover {
+    color: #a13f38;
+    text-decoration: underline;
+}
+
+
+/* =====================================
+   EMPTY STATE
+===================================== */
+
+.admin-facility-empty {
+    padding: 35px 15px !important;
+    text-align: center;
+    color: #96a49c !important;
+    font-size: 11px !important;
+}
+
+
+/* =====================================
+   NOTIFICATION
+===================================== */
+
+.admin-facility-alert {
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    background: #e6f5f0;
+    border: 1px solid #cce9dd;
+    border-radius: 7px;
+    color: #168c7d;
+    font-size: 11px;
+}
+
+
+/* =====================================
+   FOOTER
+===================================== */
+
+.admin-facilities-main .admin-footer {
+    margin-top: 30px;
+}
+
+
+/* =====================================
+   TABLET
+===================================== */
+
+@media (max-width: 900px) {
+
+    .admin-facilities-main {
+        padding: 25px 20px;
+    }
+
+    .admin-facilities-header h1 {
+        font-size: 22px;
+    }
+
+    .admin-facility-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =====================================
+   MOBILE
+===================================== */
+
+@media (max-width: 600px) {
+
+    .admin-facilities-main {
+        padding: 22px 15px;
+    }
+
+    .admin-facilities-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .admin-facilities-header h1 {
+        font-size: 21px;
+    }
+
+    .admin-facility-search-controls {
+        grid-template-columns: minmax(0, 1fr) 100px;
+    }
+
+    .admin-facility-search-controls input {
+        grid-column: 1 / -1;
+    }
+
+    .admin-facility-table-card {
+        padding: 12px;
+    }
+
+}

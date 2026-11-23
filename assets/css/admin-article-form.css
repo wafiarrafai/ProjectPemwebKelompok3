@@ -1,0 +1,337 @@
+
+/* =====================================
+   SEHATIN - ADMIN ARTICLE FORM
+===================================== */
+
+.admin-article-form-main {
+    padding: 30px 35px;
+    min-width: 0;
+}
+
+
+/* =====================================
+   BREADCRUMB
+===================================== */
+
+.article-form-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #82938b;
+    font-size: 10px;
+    margin-bottom: 8px;
+}
+
+.article-form-breadcrumb a {
+    color: #82938b;
+    text-decoration: none;
+}
+
+.article-form-breadcrumb a:hover {
+    color: #168c7d;
+}
+
+
+/* =====================================
+   HEADER
+===================================== */
+
+.article-form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 17px;
+}
+
+.article-form-header h1 {
+    color: #203e37;
+    font-size: 25px;
+    font-weight: 700;
+}
+
+
+/* HEADER BUTTONS */
+.article-form-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.article-form-actions button {
+    min-height: 38px;
+    padding: 0 16px;
+    border-radius: 7px;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+
+/* DRAFT BUTTON */
+.article-draft-button {
+    background: #fff;
+    color: #49675d;
+    border: 1px solid #e1eae5;
+}
+
+.article-draft-button:hover {
+    background: #edf7f3;
+}
+
+
+/* PUBLISH BUTTON */
+.article-publish-button {
+    background: #168c7d;
+    color: #fff;
+    border: 1px solid #168c7d;
+}
+
+.article-publish-button:hover {
+    background: #106f63;
+}
+
+
+/* =====================================
+   FORM GRID
+===================================== */
+
+.article-form-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 230px;
+    align-items: start;
+    gap: 15px;
+}
+
+
+/* =====================================
+   EDITOR CARD
+===================================== */
+
+.article-editor-card {
+    background: #fff;
+    border: 1px solid #e6eeea;
+    border-radius: 11px;
+    padding: 17px;
+    box-shadow: 0 3px 12px rgba(31, 72, 59, 0.025);
+}
+
+
+/* FORM GROUP */
+.article-form-group {
+    margin-bottom: 13px;
+}
+
+.article-form-group:last-child {
+    margin-bottom: 0;
+}
+
+
+/* LABEL */
+.article-form-group label {
+    display: block;
+    color: #304a42;
+    font-size: 11px;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
+
+
+/* INPUT AND SELECT */
+.article-form-group input,
+.article-form-group select,
+.article-form-group textarea {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #e1eae5;
+    border-radius: 6px;
+    color: #526b61;
+    font-family: inherit;
+    font-size: 11px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.article-form-group input,
+.article-form-group select {
+    height: 36px;
+}
+
+.article-form-group textarea {
+    min-height: 76px;
+    resize: vertical;
+    line-height: 1.6;
+}
+
+.article-form-group input::placeholder,
+.article-form-group textarea::placeholder {
+    color: #a5b1aa;
+}
+
+.article-form-group input:focus,
+.article-form-group select:focus,
+.article-form-group textarea:focus {
+    border-color: #168c7d;
+}
+
+
+/* HELPER TEXT */
+.article-form-helper {
+    color: #899a91;
+    font-size: 10px;
+    margin-top: -1px;
+    margin-bottom: 7px;
+    line-height: 1.5;
+}
+
+
+/* =====================================
+   PUBLICATION SETTINGS
+===================================== */
+
+.article-publication-card {
+    background: #fff;
+    border: 1px solid #e6eeea;
+    border-radius: 11px;
+    padding: 17px;
+    box-shadow: 0 3px 12px rgba(31, 72, 59, 0.025);
+}
+
+.article-publication-card h2 {
+    color: #29473f;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 17px;
+}
+
+
+/* SETTING */
+.publication-setting {
+    margin-bottom: 12px;
+}
+
+.publication-setting label {
+    display: block;
+    color: #304a42;
+    font-size: 10px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.publication-setting p {
+    color: #526b61;
+    font-size: 10px;
+    line-height: 1.6;
+}
+
+
+/* STATUS */
+.publication-status {
+    display: inline-block;
+    padding: 6px 9px;
+    border-radius: 5px;
+    background: #edf0f2;
+    color: #6d7d84;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+
+/* DIVIDER */
+.publication-divider {
+    width: 100%;
+    height: 1px;
+    background: #edf1ee;
+    margin: 13px 0;
+}
+
+
+/* DESCRIPTION */
+.publication-description {
+    color: #82938b;
+    font-size: 10px;
+    line-height: 1.7;
+}
+
+
+/* =====================================
+   ERROR MESSAGE
+===================================== */
+
+.article-form-alert {
+    padding: 12px 15px;
+    margin-bottom: 15px;
+    background: #fff0ed;
+    border: 1px solid #f2d6d0;
+    border-radius: 7px;
+    color: #a75c50;
+    font-size: 11px;
+}
+
+
+/* =====================================
+   FOOTER
+===================================== */
+
+.admin-article-form-main .admin-footer {
+    margin-top: 30px;
+}
+
+
+/* =====================================
+   TABLET
+===================================== */
+
+@media (max-width: 900px) {
+
+    .admin-article-form-main {
+        padding: 25px 20px;
+    }
+
+    .article-form-grid {
+        grid-template-columns: minmax(0, 1fr) 200px;
+    }
+
+}
+
+
+/* =====================================
+   MOBILE
+===================================== */
+
+@media (max-width: 600px) {
+
+    .admin-article-form-main {
+        padding: 22px 15px;
+    }
+
+    .article-form-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .article-form-header h1 {
+        font-size: 21px;
+    }
+
+    .article-form-actions {
+        width: 100%;
+    }
+
+    .article-form-actions button {
+        flex: 1;
+    }
+
+    .article-form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .article-publication-card {
+        order: -1;
+    }
+
+}

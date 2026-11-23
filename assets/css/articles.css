@@ -1,0 +1,417 @@
+
+/* =====================================
+   SEHATIN - ARTICLES PAGE
+===================================== */
+
+/* PAGE */
+.articles-page {
+    width: 100%;
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 25px 30px 50px;
+    min-height: 100vh;
+    background: #f3f8f6;
+}
+
+
+/* BREADCRUMB */
+.article-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 11px;
+    color: #899b95;
+    margin-bottom: 13px;
+}
+
+.article-breadcrumb a {
+    text-decoration: none;
+    color: #899b95;
+}
+
+.article-breadcrumb a:hover {
+    color: #168c78;
+}
+
+
+/* HEADING */
+.articles-heading {
+    margin-bottom: 19px;
+}
+
+.articles-heading h1 {
+    color: #193d37;
+    font-size: 29px;
+    font-weight: 700;
+    margin-bottom: 7px;
+}
+
+.articles-heading p {
+    color: #82918b;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+
+/* SEARCH */
+.article-search {
+    margin-bottom: 18px;
+}
+
+.article-search label {
+    display: block;
+    color: #314c44;
+    font-size: 12px;
+    font-weight: 500;
+    margin-bottom: 7px;
+}
+
+.article-search-form {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.article-search-form input {
+    flex: 1;
+    min-width: 0;
+    height: 34px;
+    padding: 0 13px;
+    border: 1px solid #e0e8e4;
+    border-radius: 6px;
+    outline: none;
+    background: #fff;
+    color: #334b43;
+    font-size: 11px;
+    transition: 0.2s;
+}
+
+.article-search-form input:focus {
+    border-color: #188c78;
+    box-shadow: 0 0 0 2px rgba(24, 140, 120, 0.08);
+}
+
+.article-search-form input::placeholder {
+    color: #aab5b0;
+}
+
+.article-search-form button {
+    width: 80px;
+    height: 34px;
+    border: 1px solid #e0e8e4;
+    border-radius: 6px;
+    background: #fff;
+    color: #24685b;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.article-search-form button:hover {
+    background: #168c78;
+    color: #fff;
+    border-color: #168c78;
+}
+
+
+/* FILTER */
+.article-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 19px;
+}
+
+.article-filter {
+    border: 1px solid #e1eae5;
+    background: #fff;
+    color: #71847b;
+    padding: 7px 12px;
+    border-radius: 30px;
+    font-size: 9px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.article-filter:hover {
+    border-color: #168c78;
+    color: #168c78;
+}
+
+.article-filter.active {
+    background: #168c78;
+    border-color: #168c78;
+    color: #fff;
+}
+
+
+/* ARTICLE GRID */
+.article-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 13px;
+}
+
+
+/* ARTICLE CARD */
+.article-card {
+    min-width: 0;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #e8eeeb;
+    border-radius: 13px;
+    box-shadow: 0 3px 12px rgba(39, 78, 65, 0.05);
+    transition: transform 0.25s, box-shadow 0.25s;
+}
+
+.article-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 18px rgba(39, 78, 65, 0.09);
+}
+
+
+/* ARTICLE IMAGE */
+.article-image {
+    height: 90px;
+    margin: 6px 6px 0;
+    border-radius: 9px;
+    position: relative;
+    overflow: hidden;
+    background: #e5f4f0;
+}
+
+.article-image.lifestyle {
+    background: #eaf1f5;
+}
+
+.article-image.family {
+    background: #e9f3ef;
+}
+
+
+/* IMAGE LABEL */
+.image-label {
+    position: absolute;
+    top: 10px;
+    left: 9px;
+    width: 52px;
+    height: 34px;
+    padding: 7px 5px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 6px;
+    color: #178b79;
+    font-size: 5px;
+    font-weight: 700;
+    z-index: 2;
+}
+
+
+/* IMAGE DECORATION */
+.image-circle {
+    position: absolute;
+    width: 85px;
+    height: 85px;
+    background: #f49b7d;
+    border-radius: 50%;
+    top: -37px;
+    right: -8px;
+}
+
+.image-circle-small {
+    position: absolute;
+    width: 38px;
+    height: 38px;
+    background: #f5c765;
+    border-radius: 50%;
+    right: -1px;
+    bottom: -1px;
+}
+
+
+/* ARTICLE CONTENT */
+.article-content {
+    padding: 10px 9px 11px;
+    position: relative;
+}
+
+.article-category {
+    display: block;
+    color: #168c78;
+    font-size: 8px;
+    font-weight: 600;
+    margin-bottom: 7px;
+}
+
+.article-content h2 {
+    color: #263e37;
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: 700;
+    margin-bottom: 6px;
+}
+
+.article-content p {
+    color: #82918b;
+    font-size: 9px;
+    line-height: 1.5;
+    margin-bottom: 7px;
+}
+
+.article-reading-time {
+    display: block;
+    color: #9aa8a1;
+    font-size: 8px;
+}
+
+
+/* READ LINK */
+.article-read-link {
+    display: inline-block;
+    margin-top: 9px;
+    color: #168c78;
+    font-size: 9px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.article-read-link:hover {
+    text-decoration: underline;
+}
+
+
+/* EMPTY MESSAGE */
+.article-empty {
+    text-align: center;
+    padding: 35px 15px;
+    background: #fff;
+    border-radius: 12px;
+    color: #82918b;
+}
+
+.article-empty[hidden] {
+    display: none;
+}
+
+.article-empty h3 {
+    font-size: 15px;
+    color: #29483f;
+    margin-bottom: 7px;
+}
+
+.article-empty p {
+    font-size: 11px;
+}
+
+
+/* PAGINATION */
+.article-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 9px;
+    margin-top: 17px;
+}
+
+.article-pagination button {
+    border: 1px solid #e2ebe6;
+    background: #fff;
+    color: #54766a;
+    padding: 7px 11px;
+    border-radius: 7px;
+    font-size: 9px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.article-pagination button:hover:not(:disabled) {
+    background: #168c78;
+    color: #fff;
+    border-color: #168c78;
+}
+
+.article-pagination button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+#pageNumbers {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+#pageNumbers button {
+    min-width: 25px;
+    padding: 6px;
+    border: none;
+    background: transparent;
+    color: #71847b;
+}
+
+#pageNumbers button.active {
+    color: #168c78;
+    font-weight: 700;
+}
+
+
+/* RESPONSIVE TABLET */
+@media (max-width: 768px) {
+
+    .articles-page {
+        padding: 25px 22px 45px;
+    }
+
+    .article-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* RESPONSIVE MOBILE */
+@media (max-width: 520px) {
+
+    .articles-page {
+        padding: 22px 16px 40px;
+    }
+
+    .articles-heading h1 {
+        font-size: 25px;
+    }
+
+    .articles-heading p {
+        font-size: 11px;
+    }
+
+    .article-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .article-image {
+        height: 120px;
+    }
+
+    .article-content {
+        padding: 13px;
+    }
+
+    .article-content h2 {
+        font-size: 14px;
+    }
+
+    .article-content p {
+        font-size: 11px;
+    }
+
+    .article-category {
+        font-size: 9px;
+    }
+
+    .article-reading-time {
+        font-size: 9px;
+    }
+
+}
