@@ -76,17 +76,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
     <meta charset="UTF-8">
     <title>Registrasi SEHATIN</title>
-    <link rel="stylesheet" href="assets/css/reset.css">
-    <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/register.css">
 </head>
 
 <body>
     <h2>Registrasi Pengguna</h2>
     <?php if (!empty($message)): ?>
-        <p>
-            <?= htmlspecialchars($message) ?>
-        </p>
+    <p>
+        <?= htmlspecialchars($message) ?>
+    </p>
     <?php endif; ?>
 
     <form method="POST" action="">
