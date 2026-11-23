@@ -160,9 +160,9 @@ $facilities = [
                         <?php echo htmlspecialchars($facility['type']); ?>
                     </span>
 
-                    <h2>
-                        <?php echo htmlspecialchars($facility['name']); ?>
-                    </h2>
+                    <a href="facility-detail.php?id=<?= (int) $facility['id'] ?>">
+                        <?= htmlspecialchars($facility['name']) ?>
+                    </a>
 
                     <p class="facility-address">
                         <?php echo htmlspecialchars($facility['address']); ?>

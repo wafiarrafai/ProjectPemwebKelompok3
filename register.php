@@ -3,7 +3,7 @@ require_once "config/database.php";
 $message = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    
+
     // Mengambil data dari form
     $name = trim($_POST["name"] ?? "");
     $email = trim($_POST["email"] ?? "");
@@ -18,13 +18,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         empty($confirm_password)
     ) {
         $message = "Semua field wajib diisi.";
-
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $message = "Format email tidak valid.";
-
     } elseif ($password !== $confirm_password) {
         $message = "Konfirmasi password tidak cocok.";
-
     } else {
 
         // Memeriksa apakah email sudah digunakan
@@ -38,7 +35,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($result->num_rows > 0) {
             $message = "Email sudah terdaftar.";
-
         } else {
 
             // Mengubah password menjadi hash
@@ -76,40 +72,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <!DOCTYPE html>
 <html lang="id">
-    <head>
-        <meta charset="UTF-8">
-        <title>Registrasi SEHATIN</title>
-    </head>
-    <body>
-        <h2>Registrasi Pengguna</h2>
-        <?php if (!empty($message)): ?>
-            <p>
-                <?= htmlspecialchars($message) ?>
-            </p>
-        <?php endif; ?>
 
-        <form method="POST" action="">
-            <label>Nama</label><br>
-            <input type="text" name="name" required>
-            <br><br>
+<head>
+    <meta charset="UTF-8">
+    <title>Registrasi SEHATIN</title>
+</head>
 
-            <label>Email</label><br>
-            <input type="email" name="email" required>
-            <br><br>
+<body>
+    <h2>Registrasi Pengguna</h2>
+    <?php if (!empty($message)): ?>
+    <p>
+        <?= htmlspecialchars($message) ?>
+    </p>
+    <?php endif; ?>
 
-            <label>Password</label><br>
-            <input type="password" name="password" required>
-            <br><br>
+    <form method="POST" action="">
+        <label>Nama</label><br>
+        <input type="text" name="name" required>
+        <br><br>
 
-            <label>Konfirmasi Password</label><br>
-            <input type="password" name="confirm_password" required>
-            <br><br>
+        <label>Email</label><br>
+        <input type="email" name="email" required>
+        <br><br>
 
-            <button type="submit">Daftar</button>
-        </form>
-        <p>
-            Sudah punya akun?
-            <a href="login.php">Login</a>
-        </p>
-    </body>
+        <label>Password</label><br>
+        <input type="password" name="password" required>
+        <br><br>
+
+        <label>Konfirmasi Password</label><br>
+        <input type="password" name="confirm_password" required>
+        <br><br>
+
+        <button type="submit">Daftar</button>
+    </form>
+    <p>
+        Sudah punya akun?
+        <a href="login.php">Login</a>
+    </p>
+</body>
+
 </html>
