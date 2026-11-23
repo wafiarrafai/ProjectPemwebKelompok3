@@ -41,6 +41,26 @@ $articles = [
 
 <body>
 
+    <header class="home-header">
+        <div class="home-header-inner">
+            <a href="index.php" class="home-brand" aria-label="Sehatin, beranda">
+                <span class="home-brand-icon" aria-hidden="true">S</span>
+                <span>sehatin</span>
+            </a>
+
+            <nav class="home-header-nav" aria-label="Navigasi utama">
+                <a href="index.php" aria-current="page">Beranda</a>
+                <a href="articles.php">Artikel</a>
+                <a href="facilities.php">Fasilitas</a>
+            </nav>
+
+            <div class="home-header-actions">
+                <a href="login.php" class="home-auth-link">Masuk</a>
+                <a href="register.php" class="home-auth-link home-auth-link-primary">Daftar</a>
+            </div>
+        </div>
+    </header>
+
     <main class="container">
 
         <!-- HERO SECTION -->

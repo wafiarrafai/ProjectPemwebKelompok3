@@ -56,7 +56,7 @@ $facilities = [
     <script src="assets/js/script.js" defer></script>
 </head>
 
-<body>
+<body class="facilities-layout">
 
     <!-- NAVBAR -->
     <header class="main-navbar">
