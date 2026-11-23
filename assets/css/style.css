@@ -1,0 +1,35 @@
+
+/* =================================
+   SEHATIN - GLOBAL STYLE
+================================= */
+
+:root {
+    --primary: #087F73;
+    --dark-green: #164F49;
+    --light-green: #E8F5F2;
+
+    --background: #F3F8F6;
+    --white: #FFFFFF;
+
+    --text: #203B39;
+    --muted: #718580;
+    --border: #E1EAE7;
+
+    --orange: #F59678;
+    --yellow: #F3C968;
+}
+
+body {
+    background-color: var(--background);
+    color: var(--text);
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+button {
+    border: none;
+}
