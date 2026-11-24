@@ -1,43 +1,79 @@
 <?php
-session_start();
+
+$required_role = "admin";
+require_once __DIR__ . "/../includes/auth-check.php";
+require_once __DIR__ . "/../config/database.php";
 
 $adminName = $_SESSION['name']
     ?? $_SESSION['username']
     ?? 'Admin';
 
-// DATA CONTOH SEMENTARA
-$totalUsers = 128;
-$totalArticles = 24;
-$totalFacilities = 8;
-$totalComplaints = 12;
+// NILAI AWAL STATISTIK
+$totalUsers = 0;
+$totalArticles = 0;
+$totalFacilities = 0;
+$totalComplaints = 0;
 
-// DATA KELUHAN TERBARU
-$recentComplaints = [
-    [
-        'name' => 'Keluhan umum - Siti R.',
-        'category' => 'Kesehatan umum',
-        'date' => '20 Nov 2026',
-        'status' => 'Menunggu'
-    ],
-    [
-        'name' => 'Informasi fasilitas - Budi A.',
-        'category' => 'Direktori fasilitas',
-        'date' => '19 Nov 2026',
-        'status' => 'Diproses'
-    ],
-    [
-        'name' => 'Keluhan umum - Rina P.',
-        'category' => 'Kesehatan umum',
-        'date' => '18 Nov 2026',
-        'status' => 'Selesai'
-    ]
-];
+$recentComplaints = [];
 
-function e($value)
-{
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+// MENGAMBIL STATISTIK DARI DATABASE
+$sqlStats = "SELECT
+    (SELECT COUNT(*) FROM users WHERE role = 'user') AS total_users,
+    (SELECT COUNT(*) FROM articles WHERE status = 'published') AS total_articles,
+    (SELECT COUNT(*) FROM facilities) AS total_facilities,
+    (SELECT COUNT(*) FROM complaints) AS total_complaints";
+
+$resultStats = $conn->query($sqlStats);
+
+if ($resultStats) {
+    $stats = $resultStats->fetch_assoc();
+
+    $totalUsers = (int) $stats['total_users'];
+    $totalArticles = (int) $stats['total_articles'];
+    $totalFacilities = (int) $stats['total_facilities'];
+    $totalComplaints = (int) $stats['total_complaints'];
 }
 
+// MENGAMBIL 5 KELUHAN TERBARU
+$sqlComplaints = "SELECT
+    c.id,
+    c.title,
+    u.name AS user_name,
+    cc.name AS category,
+    DATE_FORMAT(c.created_at, '%d %b %Y') AS date,
+    c.status
+FROM complaints c
+JOIN users u ON c.user_id = u.id
+JOIN complaint_categories cc ON c.category_id = cc.id
+ORDER BY c.created_at DESC
+LIMIT 5";
+
+$resultComplaints = $conn->query($sqlComplaints);
+
+if ($resultComplaints) {
+    while ($row = $resultComplaints->fetch_assoc()) {
+        $recentComplaints[] = [
+            'id' => $row['id'],
+            'title' => $row['title'],
+            'user' => $row['user_name'],
+            'category' => $row['category'],
+            'date' => $row['date'],
+            'status' => $row['status']
+        ];
+    }
+}
+
+// FUNGSI KEAMANAN OUTPUT
+function e($value)
+{
+    return htmlspecialchars(
+        (string) $value,
+        ENT_QUOTES,
+        'UTF-8'
+    );
+}
+
+// MENENTUKAN WARNA STATUS KELUHAN
 function adminStatusClass($status)
 {
     if ($status === 'Menunggu') {
@@ -145,7 +181,7 @@ function adminStatusClass($status)
                     <h1>Dashboard admin</h1>
 
                     <p>
-                        Ringkasan data aplikasi · angka contoh untuk desain.
+                        Ringkasan data aplikasi SEHATIN.
                     </p>
                 </div>
 
@@ -222,39 +258,44 @@ function adminStatusClass($status)
                 <!-- COMPLAINT LIST -->
                 <div class="admin-complaint-list">
 
-                    <?php foreach ($recentComplaints as $complaint): ?>
+                    <?php if (empty($recentComplaints)): ?>
+                        <p>Belum ada keluhan yang masuk.</p>
 
-                    <article class="admin-complaint-row">
+                    <?php else: ?>
+                        <?php foreach ($recentComplaints as $complaint): ?>
 
-                        <div class="admin-complaint-info">
+                        <article class="admin-complaint-row">
 
-                            <strong>
-                                <?= e($complaint['name']) ?>
-                            </strong>
+                            <div class="admin-complaint-info">
 
-                            <p>
-                                <?= e($complaint['category']) ?>
+                                <strong>
+                                    <?= e($complaint['title']) ?>
+                                </strong>
 
-                                <span>·</span>
-
-                                <?= e($complaint['date']) ?>
-                            </p>
-
-                        </div>
-
-
-                        <span class="admin-status <?= adminStatusClass($complaint['status']) ?>">
-                            <?= e($complaint['status']) ?>
-                        </span>
+                                <p>
+                                    <?= e($complaint['user']) ?>
+                                    <span>·</span>
+                                    <?= e($complaint['category']) ?>
+                                    <span>·</span>
+                                    <?= e($complaint['date']) ?>
+                                </p>
+                            </div>
 
 
-                        <a href="complaints/" class="admin-review-button">
-                            Tinjau
-                        </a>
+                            <span class="admin-status <?= adminStatusClass($complaint['status']) ?>">
+                                <?= e($complaint['status']) ?>
+                            </span>
 
-                    </article>
 
-                    <?php endforeach; ?>
+                            <a href="complaints/detail.php?id=<?= (int) $complaint['id'] ?>" class="admin-review-button">
+                                Tinjau
+                            </a>
+
+                        </article>
+
+                        <?php endforeach; ?>
+
+                    <?php endif; ?>
 
                 </div>
 

@@ -1,24 +1,52 @@
 <?php
-$articles = [
-    [
-        'category' => 'Kesehatan umum',
-        'title' => 'Kenali sinyal tubuh dengan lebih tenang',
-        'description' => 'Panduan umum untuk mencatat hal yang ingin kamu diskusikan dengan tenaga kesehatan.',
-        'time' => '4 menit baca'
-    ],
-    [
-        'category' => 'Pola hidup',
-        'title' => 'Rutinitas kecil untuk waktu istirahat',
-        'description' => 'Ide kebiasaan sehari-hari yang bisa dipertimbangkan sesuai kebutuhanmu.',
-        'time' => '3 menit baca'
-    ],
-    [
-        'category' => 'Keluarga',
-        'title' => 'Menyimpan informasi kesehatan keluarga',
-        'description' => 'Cara sederhana menyiapkan informasi sebelum mencari layanan yang sesuai.',
-        'time' => '5 menit baca'
-    ]
-];
+
+// SESSION
+if (session_status() !== PHP_SESSION_ACTIVE) {
+    session_start();
+}
+
+$isLoggedIn = isset($_SESSION["user_id"]);
+$userName = $_SESSION["name"] ?? "";
+$userRole = $_SESSION["role"] ?? "";
+
+// KONEKSI DATABASE
+require_once __DIR__ . "/config/database.php";
+
+// MENGAMBIL 3 ARTIKEL TERBARU
+$articles = [];
+
+$sqlArticles = "SELECT
+                    a.id,
+                    a.title,
+                    a.excerpt,
+                    a.content,
+                    c.name AS category
+                FROM articles a
+                INNER JOIN article_categories c
+                    ON a.category_id = c.id
+                WHERE a.status = 'published'
+                ORDER BY a.created_at DESC
+                LIMIT 3";
+
+$resultArticles = $conn->query($sqlArticles);
+
+if ($resultArticles) {
+    while ($row = $resultArticles->fetch_assoc()) {
+
+        // MENGHITUNG WAKTU BACA
+        $wordCount = str_word_count(strip_tags($row['content']));
+        $readingMinutes = max(1, (int) ceil($wordCount / 200));
+
+        $articles[] = [
+            'id' => $row['id'],
+            'category' => $row['category'],
+            'title' => $row['title'],
+            'description' => $row['excerpt'],
+            'time' => $readingMinutes . ' menit baca'
+        ];
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -55,8 +83,24 @@ $articles = [
             </nav>
 
             <div class="home-header-actions">
+            <?php if ($isLoggedIn): ?>
+                <?php
+                $dashboardUrl = $userRole === "admin"
+                    ? "admin/dashboard.php"
+                    : "user/dashboard.php";
+                ?>
+                <a href="<?= htmlspecialchars($dashboardUrl) ?>" class="home-auth-link">
+                    <?= htmlspecialchars($userName, ENT_QUOTES, 'UTF-8') ?>
+                </a>
+                <a href="logout.php" class="home-auth-link home-auth-link-primary">
+                    Keluar
+                </a>
+            <?php else: ?>
                 <a href="login.php" class="home-auth-link">Masuk</a>
-                <a href="register.php" class="home-auth-link home-auth-link-primary">Daftar</a>
+                <a href="register.php" class="home-auth-link home-auth-link-primary">
+                    Daftar
+                </a>
+            <?php endif; ?>
             </div>
         </div>
     </header>
@@ -163,7 +207,7 @@ $articles = [
                         </span>
 
                         <h3>
-                            <a href="articles-detail.php?id=<?= $index + 1 ?>">
+                            <a href="articles-detail.php?id=<?= (int) $article['id'] ?>">
                                 <?php echo htmlspecialchars($article['title']); ?>
                             </a>
                         </h3>

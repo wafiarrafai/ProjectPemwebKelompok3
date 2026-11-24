@@ -1,92 +1,76 @@
 <?php
-// DATA FASILITAS KESEHATAN
-$facilities = [
-    1 => [
-        'type' => 'Puskesmas',
-        'name' => 'Puskesmas Sejahtera',
-        'address' => 'Jl. Kesehatan No. 12, Purwokerto',
-        'contact' => 'Kontak belum tersedia',
-        'description' => 'Puskesmas Sejahtera merupakan salah satu fasilitas kesehatan tingkat pertama. Pengguna dapat menghubungi fasilitas secara langsung untuk memperoleh informasi mengenai layanan yang tersedia.',
-        'services' => [
-            'Informasi layanan kesehatan',
-            'Pelayanan kesehatan dasar',
-            'Informasi pemeriksaan kesehatan'
-        ]
-    ],
-    2 => [
-        'type' => 'Klinik',
-        'name' => 'Klinik Bersama',
-        'address' => 'Jl. Melati No. 8, Purwokerto',
-        'contact' => 'Kontak belum tersedia',
-        'description' => 'Klinik Bersama menyediakan informasi fasilitas kesehatan bagi masyarakat. Silakan menghubungi pihak klinik untuk memastikan jenis layanan dan jadwal operasional.',
-        'services' => [
-            'Informasi pelayanan klinik',
-            'Konsultasi layanan',
-            'Informasi pemeriksaan'
-        ]
-    ],
-    3 => [
-        'type' => 'Rumah sakit',
-        'name' => 'RSU Contoh Sehat',
-        'address' => 'Area Purwokerto',
-        'contact' => 'Kontak belum tersedia',
-        'description' => 'RSU Contoh Sehat merupakan data fasilitas rumah sakit pada direktori SEHATIN. Informasi layanan lebih lanjut dapat dikonfirmasi langsung kepada pihak rumah sakit.',
-        'services' => [
-            'Informasi layanan rumah sakit',
-            'Informasi rawat jalan',
-            'Informasi fasilitas kesehatan'
-        ]
-    ],
-    4 => [
-        'type' => 'Puskesmas',
-        'name' => 'Puskesmas Sehat Mandiri',
-        'address' => 'Jl. Merdeka, Purwokerto',
-        'contact' => 'Kontak belum tersedia',
-        'description' => 'Puskesmas Sehat Mandiri tercantum dalam direktori fasilitas kesehatan SEHATIN. Pengguna dapat menghubungi fasilitas untuk mengetahui informasi pelayanan yang tersedia.',
-        'services' => [
-            'Informasi layanan kesehatan',
-            'Pelayanan kesehatan dasar',
-            'Informasi pemeriksaan'
-        ]
-    ],
-    5 => [
-        'type' => 'Klinik',
-        'name' => 'Klinik Medika',
-        'address' => 'Jl. Jenderal Sudirman, Purwokerto',
-        'contact' => 'Kontak belum tersedia',
-        'description' => 'Klinik Medika merupakan salah satu pilihan fasilitas kesehatan dalam direktori SEHATIN. Pastikan informasi layanan dan jam operasional melalui pihak klinik.',
-        'services' => [
-            'Informasi pelayanan klinik',
-            'Informasi pemeriksaan',
-            'Konsultasi layanan'
-        ]
-    ],
-    6 => [
-        'type' => 'Rumah sakit',
-        'name' => 'Rumah Sakit Harapan',
-        'address' => 'Purwokerto',
-        'contact' => 'Kontak belum tersedia',
-        'description' => 'Rumah Sakit Harapan ditampilkan sebagai bagian dari direktori fasilitas kesehatan SEHATIN. Hubungi pihak rumah sakit untuk memperoleh informasi lebih lanjut.',
-        'services' => [
-            'Informasi layanan rumah sakit',
-            'Informasi rawat jalan',
-            'Informasi fasilitas kesehatan'
-        ]
-    ]
-];
 
-// MENGAMBIL ID FASILITAS DARI URL
-$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+require_once __DIR__ . "/config/database.php";
 
-$facility = ($id !== false && $id !== null)
-    ? ($facilities[$id] ?? null)
-    : null;
+// MENGAMBIL ID DARI URL
+$id = filter_input(INPUT_GET, "id", FILTER_VALIDATE_INT);
+
+$facility = null;
+
+// MENGAMBIL DETAIL FASILITAS DARI DATABASE
+if ($id !== false && $id !== null && $id > 0) {
+
+    $stmt = $conn->prepare(
+        "SELECT id, name, type, address, phone, description
+         FROM facilities
+         WHERE id = ?"
+    );
+
+    if ($stmt) {
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+
+        $result = $stmt->get_result();
+        $facility = $result->fetch_assoc();
+
+        $stmt->close();
+    }
+}
+
+// MELENGKAPI DATA FASILITAS
+if ($facility) {
+
+    $facility["contact"] = !empty($facility["phone"])
+        ? $facility["phone"]
+        : "Kontak belum tersedia";
+
+    $facility["description"] = !empty($facility["description"])
+        ? $facility["description"]
+        : "Informasi mengenai fasilitas ini belum tersedia.";
+
+    // INFORMASI LAYANAN UMUM BERDASARKAN JENIS FASILITAS
+    if ($facility["type"] === "Puskesmas") {
+
+        $facility["services"] = [
+            "Informasi layanan kesehatan",
+            "Pelayanan kesehatan dasar",
+            "Informasi pemeriksaan kesehatan"
+        ];
+
+    } elseif ($facility["type"] === "Klinik") {
+
+        $facility["services"] = [
+            "Informasi pelayanan klinik",
+            "Konsultasi layanan",
+            "Informasi pemeriksaan"
+        ];
+
+    } else {
+
+        $facility["services"] = [
+            "Informasi layanan rumah sakit",
+            "Informasi rawat jalan",
+            "Informasi fasilitas kesehatan"
+        ];
+    }
+}
 
 // FUNGSI UNTUK MENGAMANKAN OUTPUT
 function e($value)
 {
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars((string) $value, ENT_QUOTES, "UTF-8");
 }
+
 ?>
 
 <!DOCTYPE html>

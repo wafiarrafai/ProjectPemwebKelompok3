@@ -1,80 +1,102 @@
 <?php
-session_start();
 
-$userName = $_SESSION['name']
-    ?? $_SESSION['username']
-    ?? 'Pengguna';
+$required_role = "user";
+require_once __DIR__ . "/../../includes/auth-check.php";
+require_once __DIR__ . "/../../config/database.php";
 
-// DATA CONTOH SEMENTARA
-$complaints = [
-    1 => [
-        'title' => 'Keluhan umum',
-        'category' => 'Kesehatan umum',
-        'date' => '18 Nov 2026',
-        'status' => 'Diproses',
-        'description' => 'Saya ingin mencatat keluhan dan meminta informasi mengenai langkah administrasi berikutnya.',
-        'note' => 'Catatan sedang ditinjau oleh pengelola. Informasi ini bersifat administratif.'
-    ],
+$userId = (int) $_SESSION["user_id"];
 
-    2 => [
-        'title' => 'Catatan kesehatan',
-        'category' => 'Kesehatan mental',
-        'date' => '15 Nov 2026',
-        'status' => 'Menunggu',
-        'description' => 'Saya ingin menyampaikan catatan kesehatan saya.',
-        'note' => 'Keluhan telah diterima dan menunggu peninjauan.'
-    ],
+$userName = $_SESSION["name"]
+    ?? $_SESSION["username"]
+    ?? "Pengguna";
 
-    3 => [
-        'title' => 'Keluhan ringan',
-        'category' => 'Kesehatan umum',
-        'date' => '11 Nov 2026',
-        'status' => 'Selesai',
-        'description' => 'Saya ingin mencatat informasi mengenai keluhan saya.',
-        'note' => 'Catatan telah selesai ditindaklanjuti.'
-    ],
+// AMBIL ID KELUHAN DARI URL
+$id = filter_input(INPUT_GET, "id", FILTER_VALIDATE_INT);
 
-    4 => [
-        'title' => 'Catatan pemeriksaan',
-        'category' => 'Keluhan fisik',
-        'date' => '08 Nov 2026',
-        'status' => 'Menunggu',
-        'description' => 'Saya ingin mencatat informasi mengenai pemeriksaan.',
-        'note' => 'Catatan menunggu proses peninjauan.'
-    ]
-];
+$complaint = null;
 
-// AMBIL ID KELUHAN
-$id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
+if ($id && $id > 0) {
 
-if (!$id || !isset($complaints[$id])) {
+    // Ambil keluhan milik pengguna yang sedang login
+    $sql = "SELECT
+                c.id,
+                c.title,
+                cc.name AS category,
+                DATE_FORMAT(c.created_at, '%d %b %Y') AS date,
+                c.status,
+                c.description,
+                c.admin_note
+            FROM complaints c
+            JOIN complaint_categories cc
+                ON c.category_id = cc.id
+            WHERE c.id = ?
+                AND c.user_id = ?
+            LIMIT 1";
+
+    $stmt = $conn->prepare($sql);
+
+    if ($stmt) {
+        $stmt->bind_param("ii", $id, $userId);
+        $stmt->execute();
+
+        $stmt->bind_result(
+            $complaintId,
+            $complaintTitle,
+            $complaintCategory,
+            $complaintDate,
+            $complaintStatus,
+            $complaintDescription,
+            $complaintNote
+        );
+
+        if ($stmt->fetch()) {
+            $complaint = [
+                "id" => $complaintId,
+                "title" => $complaintTitle,
+                "category" => $complaintCategory,
+                "date" => $complaintDate,
+                "status" => $complaintStatus,
+                "description" => $complaintDescription,
+                "note" => $complaintNote
+                    ?: "Belum ada catatan tindak lanjut."
+            ];
+        }
+
+        $stmt->close();
+    }
+}
+
+// Jika data tidak ditemukan atau bukan milik pengguna
+if (!$complaint) {
     http_response_code(404);
-    $complaint = null;
-} else {
-    $complaint = $complaints[$id];
 }
 
 // ESCAPE HTML
 function e($value)
 {
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars(
+        (string) $value,
+        ENT_QUOTES,
+        "UTF-8"
+    );
 }
 
 // STATUS
-$status = $complaint['status'] ?? '';
+$status = $complaint["status"] ?? "";
 
 function detailStatusClass($status)
 {
-    if ($status === 'Menunggu') {
-        return 'waiting';
+    if ($status === "Menunggu") {
+        return "waiting";
     }
 
-    if ($status === 'Diproses') {
-        return 'processing';
+    if ($status === "Diproses") {
+        return "processing";
     }
 
-    return 'completed';
+    return "completed";
 }
+
 ?>
 
 <!DOCTYPE html>

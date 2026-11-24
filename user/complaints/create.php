@@ -1,40 +1,122 @@
 <?php
-session_start();
 
-$userName = $_SESSION['name']
-    ?? $_SESSION['username']
-    ?? 'Pengguna';
+$required_role = "user";
+require_once __DIR__ . "/../../includes/auth-check.php";
+require_once __DIR__ . "/../../config/database.php";
 
-$message = '';
+$userName = $_SESSION["name"] ?? "Pengguna";
 
-$category = '';
-$title = '';
-$description = '';
+$message = "";
+$message = $_SESSION["flash_message"] ?? "";
+unset($_SESSION["flash_message"]);
+$category = "";
+$title = "";
+$description = "";
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Token keamanan untuk form
+if (empty($_SESSION["csrf_token"])) {
+    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+}
 
-    $category = trim($_POST['category'] ?? '');
-    $title = trim($_POST['title'] ?? '');
-    $description = trim($_POST['description'] ?? '');
-    $confirmation = $_POST['confirmation'] ?? '';
+// Memproses form
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $category = trim($_POST["category"] ?? "");
+    $title = trim($_POST["title"] ?? "");
+    $description = trim($_POST["description"] ?? "");
+    $confirmation = $_POST["confirmation"] ?? "";
+    $csrfToken = $_POST["csrf_token"] ?? "";
 
     if (
-        $category !== '' &&
-        $title !== '' &&
-        $description !== '' &&
-        $confirmation === 'yes'
+        !is_string($csrfToken) ||
+        !hash_equals($_SESSION["csrf_token"], $csrfToken)
     ) {
-        $message = 'Form berhasil divalidasi. Penyimpanan database belum dihubungkan.';
+        $message = "Permintaan tidak valid. Silakan muat ulang halaman.";
+
+    } elseif (
+        $category === "" ||
+        $title === "" ||
+        $description === "" ||
+        $confirmation !== "yes"
+    ) {
+        $message = "Lengkapi semua informasi dan centang konfirmasi.";
+
+    } elseif (strlen($title) > 150) {
+        $message = "Judul maksimal 150 karakter.";
+
     } else {
-        $message = 'Lengkapi semua informasi dan centang konfirmasi terlebih dahulu.';
+
+        // Mencari ID kategori berdasarkan nama
+        $categorySql = "SELECT id
+                        FROM complaint_categories
+                        WHERE name = ?
+                        LIMIT 1";
+
+        $categoryStmt = $conn->prepare($categorySql);
+
+        if ($categoryStmt) {
+
+            $categoryStmt->bind_param("s", $category);
+            $categoryStmt->execute();
+            $categoryStmt->bind_result($categoryId);
+
+            if ($categoryStmt->fetch()) {
+
+                $categoryStmt->close();
+
+                // Menyimpan keluhan milik user yang sedang login
+                $insertSql = "INSERT INTO complaints
+                              (user_id, category_id, title, description)
+                              VALUES (?, ?, ?, ?)";
+
+                $insertStmt = $conn->prepare($insertSql);
+
+                if ($insertStmt) {
+
+                    $userId = (int) $_SESSION["user_id"];
+
+                    $insertStmt->bind_param(
+                        "iiss",
+                        $userId,
+                        $categoryId,
+                        $title,
+                        $description
+                    );
+
+                    if ($insertStmt->execute()) {
+                        $_SESSION["flash_message"] = "Keluhan berhasil disimpan.";
+
+                        $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+
+                        header("Location: create.php");
+                        exit;
+                    }else {
+                        $message = "Keluhan gagal disimpan. Silakan coba lagi.";
+                    }
+
+                    $insertStmt->close();
+
+                } else {
+                    $message = "Terjadi kesalahan pada sistem.";
+                }
+
+            } else {
+                $categoryStmt->close();
+                $message = "Kategori keluhan tidak ditemukan.";
+            }
+
+        } else {
+            $message = "Terjadi kesalahan pada sistem.";
+        }
     }
 }
 
 function e($value)
 {
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars($value, ENT_QUOTES, "UTF-8");
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">
@@ -148,6 +230,11 @@ function e($value)
 
 
                     <form action="create.php" method="POST">
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="<?= e($_SESSION['csrf_token']) ?>"
+                        >
 
                         <!-- CATEGORY -->
                         <div class="complaint-form-group">
