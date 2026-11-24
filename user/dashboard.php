@@ -155,12 +155,12 @@ function complaintStatusClass($status)
                         Ringkasan
                     </a>
 
-                    <a href="#buat-keluhan" class="sidebar-link">
+                    <a href="complaints/create.php" class="sidebar-link">
                         <span class="menu-icon">＋</span>
                         Buat keluhan
                     </a>
 
-                    <a href="#riwayat-keluhan" class="sidebar-link">
+                    <a href="complaints/history.php" class="sidebar-link">
                         <span class="menu-icon">▤</span>
                         Riwayat keluhan
                     </a>
@@ -211,7 +211,7 @@ function complaintStatusClass($status)
 
                 </div>
 
-                <a href="#buat-keluhan" class="header-action">
+                <a href="complaints/create.php" class="header-action">
                     Buat keluhan
                 </a>
 
@@ -237,7 +237,7 @@ function complaintStatusClass($status)
 
                 </div>
 
-                <a href="#buat-keluhan" class="banner-button">
+                <a href="complaints/create.php" class="banner-button">
                     Tulis keluhan
                 </a>
 
@@ -301,7 +301,7 @@ function complaintStatusClass($status)
 
                     <h2>Keluhan terbaru</h2>
 
-                    <a href="#riwayat-keluhan">
+                    <a href="complaints/history.php">
                         Lihat semua
                     </a>
 
@@ -373,7 +373,7 @@ function complaintStatusClass($status)
                     </p>
                 </div>
 
-                <a href="#buat-keluhan" class="quick-action-button">
+                <a href="complaints/create.php" class="quick-action-button">
                     Buat keluhan
                 </a>
 

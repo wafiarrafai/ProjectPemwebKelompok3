@@ -1,189 +1,59 @@
+/* Register page refinements; shared authentication styles live in auth.css. */
 
-/* ========================================
-   SEHATIN - REGISTER PAGE
-======================================== */
-
-* {
-    box-sizing: border-box;
+.register-form-wrapper {
+    max-width: 430px;
 }
 
-body {
-    min-height: 100vh;
-    margin: 0;
-    padding: 40px 20px;
-    display: flex;
+.register-form-wrapper .login-brand {
+    margin-bottom: 24px;
+}
+
+.register-heading {
+    margin-bottom: 18px;
+}
+
+.register-form {
+    gap: 13px;
+}
+
+.register-form .form-group {
+    gap: 6px;
+}
+
+.register-form .form-group input {
+    height: 42px;
+}
+
+.register-form .login-button {
+    margin-top: 2px;
+}
+
+.register-switch {
+    flex-direction: row;
     justify-content: center;
-    align-items: center;
-    font-family: 'Poppins', 'Segoe UI', sans-serif;
-    background: #f1f7f4;
-    color: #263b32;
+    gap: 6px;
+    margin-top: 18px;
 }
 
-/* REGISTER CONTAINER */
-
-body > h2 {
-    display: none;
-}
-
-body > form {
-    width: 100%;
-    max-width: 460px;
-    padding: 42px 40px;
-    background: #ffffff;
-    border: 1px solid #e5eee8;
-    border-radius: 20px;
-    box-shadow: 0 12px 40px rgba(37, 83, 58, 0.08);
-}
-
-/* PAGE TITLE */
-
-body::before {
-    content: "SEHATIN";
-    position: absolute;
-    top: 35px;
-    left: 50%;
-    transform: translateX(-50%);
-    color: #25845a;
-    font-size: 25px;
-    font-weight: 800;
-    letter-spacing: 2px;
-}
-
-/* FORM TITLE */
-
-body > form::before {
-    content: "Buat Akun Baru";
-    display: block;
-    margin-bottom: 8px;
-    color: #234b36;
-    font-size: 25px;
-    font-weight: 700;
-}
-
-/* FORM */
-
-form {
-    position: relative;
-}
-
-form label {
-    display: block;
-    margin-bottom: 8px;
-    color: #354d3f;
-    font-size: 13px;
-    font-weight: 600;
-}
-
-form br {
-    display: none;
-}
-
-form input {
-    display: block;
-    width: 100%;
-    height: 48px;
-    margin-bottom: 20px;
-    padding: 0 15px;
-    border: 1px solid #dce8df;
-    border-radius: 10px;
-    outline: none;
-    background: #fbfdfb;
-    color: #263b32;
-    font-family: inherit;
-    font-size: 14px;
-    transition: 0.2s ease;
-}
-
-form input:focus {
-    border-color: #39966a;
-    background: #ffffff;
-    box-shadow: 0 0 0 3px rgba(57, 150, 106, 0.12);
-}
-
-form input::placeholder {
-    color: #a5b4aa;
-}
-
-/* SUBMIT BUTTON */
-
-form button {
-    width: 100%;
-    height: 49px;
-    margin-top: 5px;
-    border: none;
-    border-radius: 10px;
-    background: #278657;
-    color: #ffffff;
-    font-family: inherit;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.25s ease;
-}
-
-form button:hover {
-    background: #1e7048;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 15px rgba(39, 134, 87, 0.2);
-}
-
-/* MESSAGE */
-
-body > p {
-    position: absolute;
-    top: calc(50% - 280px);
-    left: 50%;
-    width: min(460px, calc(100% - 40px));
-    transform: translateX(-50%);
-    margin: 0;
-    padding: 12px 15px;
-    border-radius: 9px;
-    background: #fff0ed;
-    color: #bd493c;
-    font-size: 13px;
-    text-align: center;
-}
-
-/* LOGIN LINK */
-
-body > p:last-child {
-    position: absolute;
-    top: calc(50% + 285px);
-    left: 50%;
-    width: 100%;
-    transform: translateX(-50%);
-    color: #75867a;
-    font-size: 13px;
-    text-align: center;
-}
-
-body > p:last-child a {
-    color: #278657;
-    font-weight: 600;
+.register-switch a {
     text-decoration: none;
 }
 
-body > p:last-child a:hover {
-    text-decoration: underline;
+.register-note {
+    margin-top: 24px;
+    text-align: center;
 }
 
-/* RESPONSIVE */
-
-@media (max-width: 480px) {
-    body {
-        padding: 85px 16px;
+@media (max-width: 600px) {
+    .register-container {
+        min-height: 100vh;
     }
 
-    body > form {
-        padding: 30px 24px;
+    .register-form-wrapper .login-brand {
+        margin-bottom: 24px;
     }
 
-    body::before {
-        top: 28px;
-    }
-
-    body > p:last-child {
-        top: auto;
-        bottom: 20px;
+    .register-note {
+        margin-top: 24px;
     }
 }
