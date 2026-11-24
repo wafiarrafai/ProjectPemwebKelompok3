@@ -1,108 +1,130 @@
 <?php
-session_start();
+
+$required_role = "admin";
+require_once __DIR__ . "/../../includes/auth-check.php";
+require_once __DIR__ . "/../../config/database.php";
 
 $adminName = $_SESSION['name']
     ?? $_SESSION['username']
     ?? 'Admin';
 
-// DATA PENGGUNA CONTOH
-if (!isset($_SESSION['admin_users'])) {
-    $_SESSION['admin_users'] = [
-        [
-            'id' => 1,
-            'name' => 'Aqil',
-            'email' => 'aqil@email.com',
-            'joined' => '20 Nov 2026',
-            'status' => 'Aktif'
-        ],
-        [
-            'id' => 2,
-            'name' => 'Siti Rahma',
-            'email' => 'siti@email.com',
-            'joined' => '19 Nov 2026',
-            'status' => 'Aktif'
-        ],
-        [
-            'id' => 3,
-            'name' => 'Rina Putri',
-            'email' => 'rina@email.com',
-            'joined' => '18 Nov 2026',
-            'status' => 'Aktif'
-        ],
-        [
-            'id' => 4,
-            'name' => 'Budi Santoso',
-            'email' => 'budi@email.com',
-            'joined' => '17 Nov 2026',
-            'status' => 'Nonaktif'
-        ],
-        [
-            'id' => 5,
-            'name' => 'Dina Amelia',
-            'email' => 'dina@email.com',
-            'joined' => '15 Nov 2026',
-            'status' => 'Aktif'
-        ]
-    ];
+// CSRF TOKEN
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
+// NOTIFIKASI
+$successMessage = $_SESSION['user_success'] ?? '';
+$errorMessage = $_SESSION['user_error'] ?? '';
+
+unset($_SESSION['user_success'], $_SESSION['user_error']);
+
 // HAPUS PENGGUNA
-if (
-    $_SERVER['REQUEST_METHOD'] === 'POST'
-    && isset($_POST['delete_id'])
-) {
-    $deleteId = (int) $_POST['delete_id'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
 
-    $_SESSION['admin_users'] = array_values(
-        array_filter(
-            $_SESSION['admin_users'],
-            function ($user) use ($deleteId) {
-                return $user['id'] !== $deleteId;
+    $csrfToken = $_POST['csrf_token'] ?? '';
+    $deleteId = filter_var($_POST['delete_id'], FILTER_VALIDATE_INT);
+
+    if (
+        !hash_equals($_SESSION['csrf_token'], $csrfToken)
+        || !$deleteId
+        || $deleteId <= 0
+    ) {
+        $_SESSION['user_error'] = "Permintaan tidak valid.";
+    } elseif ($deleteId === (int) $_SESSION['user_id']) {
+        $_SESSION['user_error'] = "Akun yang sedang digunakan tidak dapat dihapus.";
+    } else {
+
+        // Hanya akun dengan role user yang boleh dihapus dari halaman ini.
+        $stmt = $conn->prepare(
+            "DELETE FROM users WHERE id = ? AND role = 'user'"
+        );
+
+        if ($stmt) {
+            $stmt->bind_param("i", $deleteId);
+
+            try {
+                $stmt->execute();
+
+                if ($stmt->affected_rows > 0) {
+                    $_SESSION['user_success'] = "Pengguna berhasil dihapus.";
+                } else {
+                    $_SESSION['user_error'] = "Pengguna tidak ditemukan atau tidak dapat dihapus.";
+                }
+            } catch (mysqli_sql_exception $e) {
+                $_SESSION['user_error'] = "Pengguna tidak dapat dihapus karena masih memiliki data terkait.";
             }
-        )
-    );
 
-    header('Location: index.php?deleted=1');
+            $stmt->close();
+        } else {
+            $_SESSION['user_error'] = "Terjadi kesalahan saat menyiapkan penghapusan.";
+        }
+    }
+
+    header("Location: index.php");
     exit;
 }
 
-// PENCARIAN DAN FILTER
+// PENCARIAN DAN FILTER ROLE
 $keyword = trim($_GET['search'] ?? '');
-$statusFilter = $_GET['status'] ?? '';
+$roleFilter = $_GET['role'] ?? '';
 
+$allowedRoles = ['', 'user', 'admin'];
+
+if (!in_array($roleFilter, $allowedRoles, true)) {
+    $roleFilter = '';
+}
+
+// AMBIL DATA PENGGUNA
+$users = [];
+
+$sqlUsers = "SELECT id, name, email, role, created_at
+             FROM users
+             ORDER BY created_at DESC";
+
+$resultUsers = $conn->query($sqlUsers);
+
+if ($resultUsers) {
+    while ($row = $resultUsers->fetch_assoc()) {
+        $users[] = $row;
+    }
+}
+
+// FILTER DATA
 $filteredUsers = array_filter(
-    $_SESSION['admin_users'],
-    function ($user) use ($keyword, $statusFilter) {
+    $users,
+    function ($user) use ($keyword, $roleFilter) {
 
         $matchKeyword = $keyword === ''
             || stripos($user['name'], $keyword) !== false
             || stripos($user['email'], $keyword) !== false;
 
-        $matchStatus = $statusFilter === ''
-            || $user['status'] === $statusFilter;
+        $matchRole = $roleFilter === ''
+            || $user['role'] === $roleFilter;
 
-        return $matchKeyword && $matchStatus;
+        return $matchKeyword && $matchRole;
     }
 );
 
-// HELPER
+// FUNGSI KEAMANAN OUTPUT
 function e($value)
 {
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
 }
 
 // STATISTIK
-$totalUsers = count($_SESSION['admin_users']);
-$activeUsers = 0;
-$inactiveUsers = 0;
+$totalUsers = count($users);
+$regularUsers = 0;
+$adminUsers = 0;
 
-foreach ($_SESSION['admin_users'] as $user) {
-    if ($user['status'] === 'Aktif') {
-        $activeUsers++;
-    } else {
-        $inactiveUsers++;
+foreach ($users as $user) {
+    if ($user['role'] === 'user') {
+        $regularUsers++;
+    } elseif ($user['role'] === 'admin') {
+        $adminUsers++;
     }
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -204,12 +226,16 @@ foreach ($_SESSION['admin_users'] as $user) {
 
 
             <!-- NOTIFICATION -->
-            <?php if (isset($_GET['deleted'])): ?>
+            <?php if ($successMessage): ?>
+                <div class="admin-users-alert">
+                    <?= e($successMessage) ?>
+                </div>
+            <?php endif; ?>
 
-            <div class="admin-users-alert">
-                Pengguna berhasil dihapus.
-            </div>
-
+            <?php if ($errorMessage): ?>
+                <div class="admin-users-alert">
+                    <?= e($errorMessage) ?>
+                </div>
             <?php endif; ?>
 
 
@@ -218,7 +244,7 @@ foreach ($_SESSION['admin_users'] as $user) {
 
                 <div class="user-summary-card">
 
-                    <span>Total pengguna</span>
+                    <span>Total akun</span>
 
                     <h2><?= $totalUsers ?></h2>
 
@@ -228,26 +254,25 @@ foreach ($_SESSION['admin_users'] as $user) {
 
                 <div class="user-summary-card">
 
-                    <span>Pengguna aktif</span>
+                    <span>Akun pengguna</span>
 
-                    <h2><?= $activeUsers ?></h2>
+                    <h2><?= $regularUsers ?></h2>
 
-                    <p>Akun aktif</p>
+                    <p>Jumlah akun pengguna</p>
 
                 </div>
 
                 <div class="user-summary-card">
 
-                    <span>Pengguna nonaktif</span>
+                    <span>Akun admin</span>
 
-                    <h2><?= $inactiveUsers ?></h2>
+                    <h2><?= $adminUsers ?></h2>
 
-                    <p>Akun nonaktif</p>
+                    <p>Jumlah akun administrator</p>
 
                 </div>
 
             </section>
-
 
             <!-- SEARCH -->
             <section class="admin-users-search">
@@ -263,16 +288,16 @@ foreach ($_SESSION['admin_users'] as $user) {
                         <input type="text" id="searchUser" name="search" placeholder="Nama atau email pengguna"
                             value="<?= e($keyword) ?>">
 
-                        <select name="status">
+                       <select name="role">
 
-                            <option value="">Semua status</option>
+                            <option value="">Semua jenis akun</option>
 
-                            <option value="Aktif" <?= $statusFilter === 'Aktif' ? 'selected' : '' ?>>
-                                Aktif
+                            <option value="user" <?= $roleFilter === 'user' ? 'selected' : '' ?>>
+                                Pengguna
                             </option>
 
-                            <option value="Nonaktif" <?= $statusFilter === 'Nonaktif' ? 'selected' : '' ?>>
-                                Nonaktif
+                            <option value="admin" <?= $roleFilter === 'admin' ? 'selected' : '' ?>>
+                                Admin
                             </option>
 
                         </select>
@@ -311,10 +336,9 @@ foreach ($_SESSION['admin_users'] as $user) {
                                 <th>NAMA PENGGUNA</th>
                                 <th>EMAIL</th>
                                 <th>BERGABUNG</th>
-                                <th>STATUS</th>
+                                <th>JENIS AKUN</th>
                                 <th>AKSI</th>
                             </tr>
-
                         </thead>
 
                         <tbody>
@@ -341,27 +365,23 @@ foreach ($_SESSION['admin_users'] as $user) {
 
                                 </td>
 
-                                <td class="user-email-cell">
-                                    <?= e($user['email']) ?>
-                                </td>
-
-                                <td class="user-date-cell">
-                                    <?= e($user['joined']) ?>
+                               <td class="user-date-cell">
+                                    <?= e(date('d M Y', strtotime($user['created_at']))) ?>
                                 </td>
 
                                 <td>
 
-                                    <?php if ($user['status'] === 'Aktif'): ?>
+                                    <?php if ($user['role'] === 'admin'): ?>
 
-                                    <span class="user-status active">
-                                        Aktif
-                                    </span>
+                                        <span class="user-status active">
+                                            Admin
+                                        </span>
 
                                     <?php else: ?>
 
-                                    <span class="user-status inactive">
-                                        Nonaktif
-                                    </span>
+                                        <span class="user-status inactive">
+                                            Pengguna
+                                        </span>
 
                                     <?php endif; ?>
 
@@ -375,16 +395,22 @@ foreach ($_SESSION['admin_users'] as $user) {
                                             Detail
                                         </a>
 
-                                        <form action="index.php" method="POST"
-                                            onsubmit="return confirm('Yakin ingin menghapus pengguna ini?')">
+                                        <?php if ($user['role'] === 'user'): ?>
 
-                                            <input type="hidden" name="delete_id" value="<?= (int) $user['id'] ?>">
+                                            <form action="index.php" method="POST"
+                                                onsubmit="return confirm('Yakin ingin menghapus pengguna ini?')">
 
-                                            <button type="submit" class="user-delete-button">
-                                                Hapus
-                                            </button>
+                                                <input type="hidden" name="delete_id" value="<?= (int) $user['id'] ?>">
 
-                                        </form>
+                                                <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
+
+                                                <button type="submit" class="user-delete-button">
+                                                    Hapus
+                                                </button>
+
+                                            </form>
+
+                                        <?php endif; ?>
 
                                     </div>
 

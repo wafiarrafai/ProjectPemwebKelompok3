@@ -1,55 +1,70 @@
 <?php
 
-$articles = [
-    [
-        'id' => 1,
-        'category' => 'Kesehatan umum',
-        'title' => 'Kenali sinyal tubuh dengan lebih tenang',
-        'description' => 'Panduan umum untuk mencatat hal yang ingin kamu diskusikan dengan tenaga kesehatan.',
-        'reading_time' => '4 menit baca',
-        'image_type' => 'health'
-    ],
-    [
-        'id' => 2,
-        'category' => 'Pola hidup',
-        'title' => 'Rutinitas kecil untuk waktu istirahat',
-        'description' => 'Ide kebiasaan sehari-hari yang bisa dipertimbangkan sesuai kebutuhanmu.',
-        'reading_time' => '3 menit baca',
-        'image_type' => 'lifestyle'
-    ],
-    [
-        'id' => 3,
-        'category' => 'Keluarga',
-        'title' => 'Menyimpan informasi kesehatan keluarga',
-        'description' => 'Cara sederhana menyiapkan informasi sebelum mencari layanan yang sesuai.',
-        'reading_time' => '5 menit baca',
-        'image_type' => 'family'
-    ],
-    [
-        'id' => 4,
-        'category' => 'Kesehatan umum',
-        'title' => 'Pentingnya pemeriksaan kesehatan rutin',
-        'description' => 'Mengenal manfaat pemeriksaan kesehatan secara berkala.',
-        'reading_time' => '4 menit baca',
-        'image_type' => 'health'
-    ],
-    [
-        'id' => 5,
-        'category' => 'Pola hidup',
-        'title' => 'Membangun kebiasaan hidup aktif',
-        'description' => 'Langkah sederhana untuk mulai bergerak lebih aktif setiap hari.',
-        'reading_time' => '3 menit baca',
-        'image_type' => 'lifestyle'
-    ],
-    [
-        'id' => 6,
-        'category' => 'Keluarga',
-        'title' => 'Menjaga kesehatan bersama keluarga',
-        'description' => 'Kebiasaan sehat yang dapat dilakukan bersama orang-orang terdekat.',
-        'reading_time' => '5 menit baca',
-        'image_type' => 'family'
-    ]
-];
+require_once __DIR__ . "/config/database.php";
+
+// MENGAMBIL ARTIKEL YANG SUDAH DITERBITKAN
+$articles = [];
+
+$sqlArticles = "SELECT
+                    a.id,
+                    a.title,
+                    a.excerpt,
+                    a.content,
+                    c.name AS category
+                FROM articles a
+                INNER JOIN article_categories c
+                    ON a.category_id = c.id
+                WHERE a.status = 'published'
+                ORDER BY a.created_at DESC";
+
+$resultArticles = $conn->query($sqlArticles);
+
+if ($resultArticles) {
+    while ($row = $resultArticles->fetch_assoc()) {
+
+        // MENGHITUNG ESTIMASI WAKTU BACA
+        $wordCount = str_word_count(strip_tags($row['content']));
+        $readingMinutes = max(1, (int) ceil($wordCount / 200));
+
+        // MENENTUKAN ILUSTRASI BERDASARKAN KATEGORI
+        $category = strtolower($row['category']);
+
+        if (strpos($category, 'pola hidup') !== false) {
+            $imageType = 'lifestyle';
+        } elseif (strpos($category, 'keluarga') !== false) {
+            $imageType = 'family';
+        } else {
+            $imageType = 'health';
+        }
+
+        $articles[] = [
+            'id' => $row['id'],
+            'category' => $row['category'],
+            'title' => $row['title'],
+            'description' => $row['excerpt'],
+            'reading_time' => $readingMinutes . ' menit baca',
+            'image_type' => $imageType
+        ];
+    }
+}
+
+// MENGAMBIL KATEGORI YANG MEMILIKI ARTIKEL TERBIT
+$categories = [];
+
+$sqlCategories = "SELECT DISTINCT c.name
+                  FROM article_categories c
+                  INNER JOIN articles a
+                    ON c.id = a.category_id
+                  WHERE a.status = 'published'
+                  ORDER BY c.name ASC";
+
+$resultCategories = $conn->query($sqlCategories);
+
+if ($resultCategories) {
+    while ($row = $resultCategories->fetch_assoc()) {
+        $categories[] = $row['name'];
+    }
+}
 
 ?>
 
@@ -107,29 +122,25 @@ $articles = [
             </div>
 
         </section>
-
-
+        
         <!-- CATEGORY FILTER -->
         <section class="article-filters">
 
-            <button type="button" class="article-filter active" data-category="Semua artikel">
+            <button type="button" class="article-filter active"
+                data-category="Semua artikel">
                 Semua artikel
             </button>
 
-            <button type="button" class="article-filter" data-category="Keluarga">
-                Keluarga
-            </button>
+            <?php foreach ($categories as $category): ?>
 
-            <button type="button" class="article-filter" data-category="Pola hidup">
-                Pola hidup
-            </button>
+                <button type="button" class="article-filter"
+                    data-category="<?= htmlspecialchars($category, ENT_QUOTES, 'UTF-8') ?>">
+                    <?= htmlspecialchars($category, ENT_QUOTES, 'UTF-8') ?>
+                </button>
 
-            <button type="button" class="article-filter" data-category="Kesehatan umum">
-                Kesehatan umum
-            </button>
+            <?php endforeach; ?>
 
         </section>
-
 
         <!-- ARTICLE LIST -->
         <section class="article-list">

@@ -1,81 +1,131 @@
 <?php
-session_start();
 
-$adminName = $_SESSION['name']
-    ?? $_SESSION['username']
-    ?? 'Admin';
+$required_role = "admin";
+require_once __DIR__ . "/../../includes/auth-check.php";
+require_once __DIR__ . "/../../config/database.php";
 
-// DATA KATEGORI CONTOH
-if (!isset($_SESSION['admin_categories'])) {
-    $_SESSION['admin_categories'] = [
-        [
-            'id' => 1,
-            'name' => 'Kesehatan umum',
-            'description' => 'Informasi kesehatan dan tips menjaga kondisi tubuh.',
-            'articles' => 8,
-            'status' => 'Aktif'
-        ],
-        [
-            'id' => 2,
-            'name' => 'Pola hidup',
-            'description' => 'Informasi kebiasaan sehat dan gaya hidup.',
-            'articles' => 6,
-            'status' => 'Aktif'
-        ],
-        [
-            'id' => 3,
-            'name' => 'Keluarga',
-            'description' => 'Informasi kesehatan untuk seluruh anggota keluarga.',
-            'articles' => 5,
-            'status' => 'Aktif'
-        ],
-        [
-            'id' => 4,
-            'name' => 'Kesehatan mental',
-            'description' => 'Informasi mengenai kesehatan mental dan emosional.',
-            'articles' => 3,
-            'status' => 'Aktif'
-        ]
-    ];
+$adminName = $_SESSION["name"]
+    ?? $_SESSION["username"]
+    ?? "Admin";
+
+// CSRF token
+if (empty($_SESSION["csrf_token"])) {
+    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
 }
 
-// HAPUS KATEGORI
-if (
-    $_SERVER['REQUEST_METHOD'] === 'POST'
-    && isset($_POST['delete_id'])
-) {
+// NOTIFIKASI
+$successMessage = $_SESSION["category_success"] ?? "";
+$errorMessage = $_SESSION["category_error"] ?? "";
 
-    $deleteId = (int) $_POST['delete_id'];
+unset($_SESSION["category_success"], $_SESSION["category_error"]);
 
-    $_SESSION['admin_categories'] = array_values(
-        array_filter(
-            $_SESSION['admin_categories'],
-            function ($category) use ($deleteId) {
-                return $category['id'] !== $deleteId;
+// PROSES HAPUS KATEGORI
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
+
+    $deleteId = filter_input(INPUT_POST, "delete_id", FILTER_VALIDATE_INT);
+    $csrfToken = $_POST["csrf_token"] ?? "";
+
+    if (
+        !is_string($csrfToken) ||
+        !hash_equals($_SESSION["csrf_token"], $csrfToken)
+    ) {
+        $_SESSION["category_error"] = "Permintaan tidak valid.";
+    } elseif (!$deleteId || $deleteId <= 0) {
+        $_SESSION["category_error"] = "ID kategori tidak valid.";
+    } else {
+
+        // Memeriksa apakah kategori masih digunakan artikel
+        $stmtCheck = $conn->prepare(
+            "SELECT COUNT(*) AS total
+             FROM articles
+             WHERE category_id = ?"
+        );
+
+        $stmtCheck->bind_param("i", $deleteId);
+        $stmtCheck->execute();
+
+        $resultCheck = $stmtCheck->get_result();
+        $usage = $resultCheck->fetch_assoc()["total"];
+
+        $stmtCheck->close();
+
+        if ($usage > 0) {
+            $_SESSION["category_error"] =
+                "Kategori tidak bisa dihapus karena masih digunakan oleh artikel.";
+        } else {
+
+            $stmtDelete = $conn->prepare(
+                "DELETE FROM article_categories WHERE id = ?"
+            );
+
+            $stmtDelete->bind_param("i", $deleteId);
+
+            if ($stmtDelete->execute() && $stmtDelete->affected_rows > 0) {
+                $_SESSION["category_success"] = "Kategori berhasil dihapus.";
+            } else {
+                $_SESSION["category_error"] = "Kategori gagal dihapus atau tidak ditemukan.";
             }
-        )
-    );
 
-    header('Location: index.php?deleted=1');
+            $stmtDelete->close();
+        }
+    }
+
+    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+
+    header("Location: index.php");
     exit;
 }
 
 // PENCARIAN
-$keyword = trim($_GET['search'] ?? '');
+$keyword = trim($_GET["search"] ?? "");
 
+// MENGAMBIL KATEGORI DAN JUMLAH ARTIKEL
+$categories = [];
+
+$sqlCategories = "SELECT
+                    c.id,
+                    c.name,
+                    COUNT(a.id) AS articles
+                  FROM article_categories c
+                  LEFT JOIN articles a ON c.id = a.category_id
+                  GROUP BY c.id, c.name
+                  ORDER BY c.name ASC";
+
+$resultCategories = $conn->query($sqlCategories);
+
+if ($resultCategories) {
+    while ($row = $resultCategories->fetch_assoc()) {
+        $row["description"] = "";
+        $row["status"] = "Aktif";
+
+        $categories[] = $row;
+    }
+}
+
+// FILTER KATEGORI
 $filteredCategories = array_filter(
-    $_SESSION['admin_categories'],
+    $categories,
     function ($category) use ($keyword) {
-        return $keyword === ''
-            || stripos($category['name'], $keyword) !== false
-            || stripos($category['description'], $keyword) !== false;
+        return $keyword === ""
+            || stripos($category["name"], $keyword) !== false;
     }
 );
+
+// RINGKASAN
+$totalCategories = count($categories);
+
+$resultTotalArticles = $conn->query(
+    "SELECT COUNT(*) AS total FROM articles"
+);
+
+$totalArticles = $resultTotalArticles
+    ? (int) $resultTotalArticles->fetch_assoc()["total"]
+    : 0;
 
 // HELPER
 function e($value)
 {
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars((string) $value, ENT_QUOTES, "UTF-8");
 }
 ?>
 
@@ -181,13 +231,18 @@ function e($value)
             </header>
 
 
+            
             <!-- NOTIFICATION -->
-            <?php if (isset($_GET['deleted'])): ?>
+            <?php if ($successMessage !== ""): ?>
+                <div class="categories-alert">
+                    <?= e($successMessage) ?>
+                </div>
+            <?php endif; ?>
 
-            <div class="categories-alert">
-                Kategori berhasil dihapus.
-            </div>
-
+            <?php if ($errorMessage !== ""): ?>
+                <div class="categories-alert">
+                    <?= e($errorMessage) ?>
+                </div>
             <?php endif; ?>
 
 
@@ -224,7 +279,7 @@ function e($value)
                     <span>Total kategori</span>
 
                     <h2>
-                        <?= count($_SESSION['admin_categories']) ?>
+                        <?= $totalCategories ?>
                     </h2>
 
                     <p>Kategori tersedia</p>
@@ -236,15 +291,7 @@ function e($value)
                     <span>Total artikel</span>
 
                     <h2>
-                        <?php
-                        $totalArticles = 0;
-
-                        foreach ($_SESSION['admin_categories'] as $category) {
-                            $totalArticles += $category['articles'];
-                        }
-
-                        echo $totalArticles;
-                        ?>
+                        <?= $totalArticles ?>
                     </h2>
 
                     <p>Artikel dalam kategori</p>
@@ -321,7 +368,7 @@ function e($value)
                                             onsubmit="return confirm('Yakin ingin menghapus kategori ini?')">
 
                                             <input type="hidden" name="delete_id" value="<?= (int) $category['id'] ?>">
-
+                                            <input type="hidden" name="csrf_token" value="<?= e($_SESSION['csrf_token']) ?>">
                                             <button type="submit" class="category-delete-button">
                                                 Hapus
                                             </button>

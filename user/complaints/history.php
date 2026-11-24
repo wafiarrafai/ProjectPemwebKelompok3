@@ -1,93 +1,124 @@
 <?php
-session_start();
 
-$userName = $_SESSION['name']
-    ?? $_SESSION['username']
-    ?? 'Pengguna';
+// Memeriksa login dan role pengguna
+$required_role = "user";
+require_once __DIR__ . "/../../includes/auth-check.php";
 
-// DATA CONTOH SEMENTARA
-$complaints = [
-    [
-        'id' => 1,
-        'category' => 'Kesehatan umum',
-        'title' => 'Keluhan umum',
-        'date' => '20 Nov 2026',
-        'status' => 'Menunggu'
-    ],
-    [
-        'id' => 2,
-        'category' => 'Kesehatan mental',
-        'title' => 'Catatan kesehatan',
-        'date' => '15 Nov 2026',
-        'status' => 'Diproses'
-    ],
-    [
-        'id' => 3,
-        'category' => 'Kesehatan umum',
-        'title' => 'Keluhan ringan',
-        'date' => '11 Nov 2026',
-        'status' => 'Selesai'
-    ],
-    [
-        'id' => 4,
-        'category' => 'Keluhan fisik',
-        'title' => 'Catatan pemeriksaan',
-        'date' => '08 Nov 2026',
-        'status' => 'Menunggu'
-    ]
-];
+// Koneksi database
+require_once __DIR__ . "/../../config/database.php";
 
-// HITUNG STATISTIK
+$userId = (int) $_SESSION["user_id"];
+
+$userName = $_SESSION["name"] ?? "Pengguna";
+
+// Mengambil keluhan milik pengguna yang sedang login
+$complaints = [];
+
+$sql = "SELECT
+            c.id,
+            cc.name AS category,
+            c.title,
+            DATE_FORMAT(c.created_at, '%d %b %Y') AS date,
+            c.status
+        FROM complaints c
+        JOIN complaint_categories cc
+            ON c.category_id = cc.id
+        WHERE c.user_id = ?
+        ORDER BY c.created_at DESC";
+
+$stmt = $conn->prepare($sql);
+
+if ($stmt) {
+
+    $stmt->bind_param("i", $userId);
+    $stmt->execute();
+
+    $stmt->bind_result(
+        $complaintId,
+        $complaintCategory,
+        $complaintTitle,
+        $complaintDate,
+        $complaintStatus
+    );
+
+    while ($stmt->fetch()) {
+        $complaints[] = [
+            "id" => $complaintId,
+            "category" => $complaintCategory,
+            "title" => $complaintTitle,
+            "date" => $complaintDate,
+            "status" => $complaintStatus
+        ];
+    }
+
+    $stmt->close();
+}
+
+// Menghitung statistik seluruh keluhan pengguna
 $total = count($complaints);
 $waiting = 0;
 $processing = 0;
 $completed = 0;
 
 foreach ($complaints as $complaint) {
-    if ($complaint['status'] === 'Menunggu') {
+
+    if ($complaint["status"] === "Menunggu") {
         $waiting++;
-    } elseif ($complaint['status'] === 'Diproses') {
+    } elseif ($complaint["status"] === "Diproses") {
         $processing++;
-    } elseif ($complaint['status'] === 'Selesai') {
+    } elseif ($complaint["status"] === "Selesai") {
         $completed++;
     }
 }
 
-// FILTER STATUS
-$filter = $_GET['status'] ?? 'Semua';
+// Filter berdasarkan status
+$filter = $_GET["status"] ?? "Semua";
 
-$allowedFilters = ['Semua', 'Menunggu', 'Diproses', 'Selesai'];
+$allowedFilters = [
+    "Semua",
+    "Menunggu",
+    "Diproses",
+    "Selesai"
+];
 
 if (!in_array($filter, $allowedFilters, true)) {
-    $filter = 'Semua';
+    $filter = "Semua";
 }
 
 $filteredComplaints = array_filter(
     $complaints,
     function ($complaint) use ($filter) {
-        return $filter === 'Semua'
-            || $complaint['status'] === $filter;
+        return $filter === "Semua"
+            || $complaint["status"] === $filter;
     }
 );
 
+// Mengamankan output HTML
 function e($value)
 {
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars(
+        (string) $value,
+        ENT_QUOTES,
+        "UTF-8"
+    );
 }
 
+// Menentukan class status
 function statusClass($status)
 {
-    if ($status === 'Menunggu') {
-        return 'waiting';
+    if ($status === "Menunggu") {
+        return "waiting";
     }
 
-    if ($status === 'Diproses') {
-        return 'processing';
+    if ($status === "Diproses") {
+        return "processing";
     }
 
-    return 'completed';
+    return "completed";
 }
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">

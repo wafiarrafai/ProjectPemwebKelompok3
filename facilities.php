@@ -1,43 +1,31 @@
 <?php
 
-$facilities = [
-    [
-        'type' => 'Puskesmas',
-        'name' => 'Puskesmas Sejahtera',
-        'address' => 'Jl. Kesehatan No. 12, Purwokerto',
-        'contact' => 'Kontak belum tersedia'
-    ],
-    [
-        'type' => 'Klinik',
-        'name' => 'Klinik Bersama',
-        'address' => 'Jl. Melati No. 8, Purwokerto',
-        'contact' => 'Kontak belum tersedia'
-    ],
-    [
-        'type' => 'Rumah sakit',
-        'name' => 'RSU Contoh Sehat',
-        'address' => 'Area Purwokerto',
-        'contact' => 'Kontak belum tersedia'
-    ],
-    [
-        'type' => 'Puskesmas',
-        'name' => 'Puskesmas Sehat Mandiri',
-        'address' => 'Jl. Merdeka, Purwokerto',
-        'contact' => 'Kontak belum tersedia'
-    ],
-    [
-        'type' => 'Klinik',
-        'name' => 'Klinik Medika',
-        'address' => 'Jl. Jenderal Sudirman, Purwokerto',
-        'contact' => 'Kontak belum tersedia'
-    ],
-    [
-        'type' => 'Rumah sakit',
-        'name' => 'Rumah Sakit Harapan',
-        'address' => 'Purwokerto',
-        'contact' => 'Kontak belum tersedia'
-    ]
-];
+require_once __DIR__ . "/config/database.php";
+
+// MENGAMBIL DATA FASILITAS DARI DATABASE
+$facilities = [];
+
+$sqlFacilities = "SELECT
+                    id,
+                    name,
+                    type,
+                    address,
+                    phone
+                  FROM facilities
+                  ORDER BY name ASC";
+
+$resultFacilities = $conn->query($sqlFacilities);
+
+if ($resultFacilities) {
+    while ($row = $resultFacilities->fetch_assoc()) {
+
+        $row["contact"] = !empty($row["phone"])
+            ? $row["phone"]
+            : "Kontak belum tersedia";
+
+        $facilities[] = $row;
+    }
+}
 
 ?>
 

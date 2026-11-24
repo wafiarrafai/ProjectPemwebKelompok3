@@ -88,3 +88,41 @@ CREATE TABLE complaints (
         REFERENCES complaint_categories(id)
         ON UPDATE CASCADE ON DELETE RESTRICT
 );
+
+--Untuk isi kategori keluhan
+INSERT IGNORE INTO complaint_categories (name)
+VALUES
+('Kesehatan umum'),
+('Keluhan fisik'),
+('Kesehatan mental'),
+('Lainnya');
+
+--Untuk isi kategori artikel
+INSERT INTO article_categories (name)
+VALUES
+    ('Kesehatan Umum'),
+    ('Pola Hidup Sehat'),
+    ('Kesehatan Mental'),
+    ('Kesehatan Keluarga'),
+    ('Nutrisi dan Gizi'),
+    ('Lainnya');
+
+/*
+Membuat akun admin. Ini buat contoh aja. Kalo mau ubah sendiri juga bisa. Untuk password pake hash.
+Password : admin1234
+*/
+INSERT INTO users (
+    name,
+    email,
+    password,
+    role,
+    created_at,
+    updated_at
+) VALUES (
+    'Admin SEHATIN',
+    'admin@gmail.com',
+    '$2y$10$gzKNgqmVkv5780oEcUA8fe.q4Ag2YyHPZ1Z0Sl4c0JReUO/dNRx1m',
+    'admin',
+    NOW(),
+    NOW()
+);

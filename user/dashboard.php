@@ -1,26 +1,120 @@
 <?php
-session_start();
 
-// Nama pengguna dari session login
-$userName = $_SESSION['name']
-    ?? $_SESSION['username']
-    ?? 'Aqil';
+$required_role = "user";
+require_once __DIR__ . "/../includes/auth-check.php";
+require_once __DIR__ . "/../config/database.php";
 
-// Data contoh sementara
-$totalComplaints = 4;
-$pendingComplaints = 2;
-$completedComplaints = 1;
+$userId = (int) $_SESSION["user_id"];
 
-$recentComplaints = [
-    [
-        'title' => 'Keluhan umum',
-        'description' => 'Kesehatan umum',
-        'date' => '20 Nov 2026',
-        'status' => 'Menunggu'
-    ]
-];
+$userName = $_SESSION["name"]
+    ?? $_SESSION["username"]
+    ?? "Pengguna";
+
+// NILAI AWAL STATISTIK
+$totalComplaints = 0;
+$pendingComplaints = 0;
+$completedComplaints = 0;
+
+// MENGAMBIL STATISTIK KELUHAN PENGGUNA
+$sqlStats = "SELECT
+    COUNT(*) AS total,
+    SUM(status IN ('Menunggu', 'Diproses')) AS pending,
+    SUM(status = 'Selesai') AS completed
+FROM complaints
+WHERE user_id = ?";
+
+$stmtStats = $conn->prepare($sqlStats);
+
+if ($stmtStats) {
+
+    $stmtStats->bind_param("i", $userId);
+    $stmtStats->execute();
+
+    $stmtStats->bind_result(
+        $total,
+        $pending,
+        $completed
+    );
+
+    if ($stmtStats->fetch()) {
+        $totalComplaints = (int) $total;
+        $pendingComplaints = (int) $pending;
+        $completedComplaints = (int) $completed;
+    }
+
+    $stmtStats->close();
+}
+
+// MENGAMBIL 5 KELUHAN TERBARU MILIK PENGGUNA
+$recentComplaints = [];
+
+$sqlRecent = "SELECT
+    c.id,
+    c.title,
+    cc.name AS category,
+    DATE_FORMAT(c.created_at, '%d %b %Y') AS date,
+    c.status
+FROM complaints c
+JOIN complaint_categories cc
+    ON c.category_id = cc.id
+WHERE c.user_id = ?
+ORDER BY c.created_at DESC
+LIMIT 5";
+
+$stmtRecent = $conn->prepare($sqlRecent);
+
+if ($stmtRecent) {
+
+    $stmtRecent->bind_param("i", $userId);
+    $stmtRecent->execute();
+
+    $stmtRecent->bind_result(
+        $complaintId,
+        $complaintTitle,
+        $complaintCategory,
+        $complaintDate,
+        $complaintStatus
+    );
+
+    while ($stmtRecent->fetch()) {
+        $recentComplaints[] = [
+            "id" => $complaintId,
+            "title" => $complaintTitle,
+            "category" => $complaintCategory,
+            "date" => $complaintDate,
+            "status" => $complaintStatus
+        ];
+    }
+
+    $stmtRecent->close();
+}
+
+// FUNGSI KEAMANAN OUTPUT
+function e($value)
+{
+    return htmlspecialchars(
+        (string) $value,
+        ENT_QUOTES,
+        "UTF-8"
+    );
+}
+
+// MENENTUKAN CLASS STATUS
+function complaintStatusClass($status)
+{
+    if ($status === "Menunggu") {
+        return "waiting";
+    }
+
+    if ($status === "Diproses") {
+        return "processing";
+    }
+
+    return "completed";
+}
 
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">
@@ -71,7 +165,7 @@ $recentComplaints = [
                         Riwayat keluhan
                     </a>
 
-                    <a href="../profile.php" class="sidebar-link">
+                    <a href="profile.php" class="sidebar-link">
                         <span class="menu-icon">♙</span>
                         Profil
                     </a>
@@ -223,37 +317,46 @@ $recentComplaints = [
                     </div>
 
 
-                    <?php foreach ($recentComplaints as $complaint): ?>
+                    <?php if (empty($recentComplaints)): ?>
+                        
+                        <p>Belum ada keluhan yang dicatat.</p>
 
-                    <div class="complaint-row">
+                    <?php else: ?>
 
-                        <div class="complaint-information">
+                        <?php foreach ($recentComplaints as $complaint): ?>
 
-                            <strong>
-                                <?= htmlspecialchars($complaint['title'], ENT_QUOTES, 'UTF-8') ?>
-                            </strong>
+                            <div class="complaint-row">
 
-                            <p>
-                                <?= htmlspecialchars($complaint['description'], ENT_QUOTES, 'UTF-8') ?>
-                                <span>·</span>
-                                <?= htmlspecialchars($complaint['date'], ENT_QUOTES, 'UTF-8') ?>
-                            </p>
+                                <div class="complaint-information">
 
-                        </div>
+                                    <strong>
+                                        <?= e($complaint['title']) ?>
+                                    </strong>
 
+                                    <p>
+                                        <?= e($complaint['category']) ?>
+                                        <span>·</span>
+                                        <?= e($complaint['date']) ?>
+                                    </p>
 
-                        <span class="complaint-status waiting">
-                            <?= htmlspecialchars($complaint['status'], ENT_QUOTES, 'UTF-8') ?>
-                        </span>
+                                </div>
 
+                                <span class="complaint-status <?= e(complaintStatusClass($complaint['status'])) ?>">
+                                    <?= e($complaint['status']) ?>
+                                </span>
 
-                        <a href="#riwayat-keluhan" class="complaint-detail">
-                            Detail
-                        </a>
+                                <a
+                                    href="complaints/detail.php?id=<?= (int) $complaint['id'] ?>"
+                                    class="complaint-detail"
+                                >
+                                    Detail
+                                </a>
 
-                    </div>
+                            </div>
 
-                    <?php endforeach; ?>
+                        <?php endforeach; ?>
+
+                    <?php endif; ?>
 
                 </div>
 

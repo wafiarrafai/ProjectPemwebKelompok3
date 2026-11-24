@@ -1,12 +1,85 @@
 <?php
 session_start();
+require_once __DIR__ . "/config/database.php";
+$error = "";
 
-$error = '';
+// Jika sudah login, arahkan ke dashboard sesuai role
+if (isset($_SESSION["user_id"])) {
+    if ($_SESSION["role"] === "admin") {
+        header("Location: admin/dashboard.php");
+    } else {
+        header("Location: user/dashboard.php");
+    }
+    exit;
+}
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $error = 'Fitur autentikasi belum dihubungkan ke database.';
+// Memproses form login
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $email = trim($_POST["email"] ?? "");
+    $password = $_POST["password"] ?? "";
+
+    // Validasi input
+    if ($email === "" || $password === "") {
+        $error = "Email dan kata sandi wajib diisi.";
+
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        $error = "Format email tidak valid.";
+
+    } else {
+        // Mencari akun berdasarkan email
+        $sql = "SELECT id, name, email, password, role
+                FROM users
+                WHERE email = ?
+                LIMIT 1";
+
+        $stmt = $conn->prepare($sql);
+
+        if ($stmt) {
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+
+            // Mengambil hasil query
+            $stmt->bind_result(
+                $userId,
+                $userName,
+                $userEmail,
+                $storedPassword,
+                $userRole
+            );
+
+            // Memeriksa akun dan password
+                if ($stmt->fetch() && is_string($storedPassword) && password_verify($password, $storedPassword)) {
+
+                $stmt->close();
+
+                // Mengganti ID session setelah login
+                session_regenerate_id(true);
+
+                // Menyimpan identitas pengguna
+                $_SESSION["user_id"] = $userId;
+                $_SESSION["name"] = $userName;
+                $_SESSION["email"] = $userEmail;
+                $_SESSION["role"] = $userRole;
+
+                // Mengarahkan berdasarkan role
+                if ($userRole === "admin") {
+                    header("Location: admin/dashboard.php");
+                } else {
+                    header("Location: user/dashboard.php");
+                }
+                exit;
+
+            } else {
+                $error = "Email atau kata sandi salah.";
+                $stmt->close();
+            }
+        } else {
+            $error = "Terjadi kesalahan pada sistem. Silakan coba lagi.";
+        }
+    }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="id">

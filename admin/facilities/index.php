@@ -1,123 +1,151 @@
+
 <?php
-session_start();
 
-$adminName = $_SESSION['name']
-    ?? $_SESSION['username']
-    ?? 'Admin';
+$required_role = "admin";
+require_once __DIR__ . "/../../includes/auth-check.php";
+require_once __DIR__ . "/../../config/database.php";
 
-// DATA FASILITAS CONTOH
-if (!isset($_SESSION['admin_facilities'])) {
-    $_SESSION['admin_facilities'] = [
-        [
-            'id' => 1,
-            'name' => 'Puskesmas Sejahtera',
-            'type' => 'Puskesmas',
-            'address' => 'Jl. Kesehatan No. 12, Purwokerto',
-            'contact' => 'Kontak belum tersedia',
-            'status' => 'Aktif'
-        ],
-        [
-            'id' => 2,
-            'name' => 'Klinik Bersama',
-            'type' => 'Klinik',
-            'address' => 'Jl. Melati No. 8, Purwokerto',
-            'contact' => 'Kontak belum tersedia',
-            'status' => 'Aktif'
-        ],
-        [
-            'id' => 3,
-            'name' => 'RSU Contoh Sehat',
-            'type' => 'Rumah sakit',
-            'address' => 'Area Purwokerto',
-            'contact' => 'Kontak belum tersedia',
-            'status' => 'Aktif'
-        ],
-        [
-            'id' => 4,
-            'name' => 'Puskesmas Sehat Mandiri',
-            'type' => 'Puskesmas',
-            'address' => 'Jl. Merdeka, Purwokerto',
-            'contact' => 'Kontak belum tersedia',
-            'status' => 'Aktif'
-        ],
-        [
-            'id' => 5,
-            'name' => 'Klinik Medika',
-            'type' => 'Klinik',
-            'address' => 'Jl. Jenderal Sudirman, Purwokerto',
-            'contact' => 'Kontak belum tersedia',
-            'status' => 'Aktif'
-        ],
-        [
-            'id' => 6,
-            'name' => 'Rumah Sakit Harapan',
-            'type' => 'Rumah sakit',
-            'address' => 'Purwokerto',
-            'contact' => 'Kontak belum tersedia',
-            'status' => 'Aktif'
-        ]
-    ];
+$adminName = $_SESSION["name"]
+    ?? $_SESSION["username"]
+    ?? "Admin";
+
+// CSRF TOKEN
+if (empty($_SESSION["csrf_token"])) {
+    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
 }
 
-// HAPUS FASILITAS
-if (
-    $_SERVER['REQUEST_METHOD'] === 'POST'
-    && isset($_POST['delete_id'])
-) {
-    $deleteId = (int) $_POST['delete_id'];
+// NOTIFIKASI
+$successMessage = $_SESSION["facility_success"] ?? "";
+$errorMessage = $_SESSION["facility_error"] ?? "";
 
-    $_SESSION['admin_facilities'] = array_values(
-        array_filter(
-            $_SESSION['admin_facilities'],
-            function ($facility) use ($deleteId) {
-                return $facility['id'] !== $deleteId;
+unset($_SESSION["facility_success"], $_SESSION["facility_error"]);
+
+// PROSES HAPUS FASILITAS
+if ($_SERVER["REQUEST_METHOD"] === "POST" && isset($_POST["delete_id"])) {
+
+    $deleteId = filter_input(INPUT_POST, "delete_id", FILTER_VALIDATE_INT);
+    $csrfToken = $_POST["csrf_token"] ?? "";
+
+    if (
+        !is_string($csrfToken) ||
+        !hash_equals($_SESSION["csrf_token"], $csrfToken)
+    ) {
+        $_SESSION["facility_error"] = "Permintaan tidak valid.";
+
+    } elseif (!$deleteId || $deleteId <= 0) {
+        $_SESSION["facility_error"] = "ID fasilitas tidak valid.";
+
+    } else {
+
+        $stmtDelete = $conn->prepare(
+            "DELETE FROM facilities WHERE id = ?"
+        );
+
+        if (!$stmtDelete) {
+            $_SESSION["facility_error"] =
+                "Gagal menyiapkan penghapusan fasilitas.";
+
+        } else {
+
+            $stmtDelete->bind_param("i", $deleteId);
+
+            if ($stmtDelete->execute() && $stmtDelete->affected_rows > 0) {
+                $_SESSION["facility_success"] =
+                    "Fasilitas berhasil dihapus.";
+            } else {
+                $_SESSION["facility_error"] =
+                    "Fasilitas gagal dihapus atau tidak ditemukan.";
             }
-        )
-    );
 
-    header('Location: index.php?deleted=1');
+            $stmtDelete->close();
+        }
+    }
+
+    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+
+    header("Location: index.php");
     exit;
 }
 
 // FILTER DAN PENCARIAN
-$keyword = trim($_GET['search'] ?? '');
-$typeFilter = $_GET['type'] ?? '';
+$keyword = trim($_GET["search"] ?? "");
+$typeFilter = $_GET["type"] ?? "";
 
+$allowedTypes = ["Puskesmas", "Klinik", "Rumah sakit"];
+
+if (!in_array($typeFilter, ["", ...$allowedTypes], true)) {
+    $typeFilter = "";
+}
+
+// MENGAMBIL DATA FASILITAS
+$facilities = [];
+
+$sqlFacilities = "SELECT
+                    id,
+                    name,
+                    type,
+                    address,
+                    phone,
+                    description
+                  FROM facilities
+                  ORDER BY name ASC";
+
+$resultFacilities = $conn->query($sqlFacilities);
+
+if ($resultFacilities) {
+
+    while ($row = $resultFacilities->fetch_assoc()) {
+
+        $row["contact"] = !empty($row["phone"])
+            ? $row["phone"]
+            : "Kontak belum tersedia";
+
+        $row["status"] = "Aktif";
+
+        $facilities[] = $row;
+    }
+}
+
+// MENERAPKAN FILTER
 $filteredFacilities = array_filter(
-    $_SESSION['admin_facilities'],
+    $facilities,
     function ($facility) use ($keyword, $typeFilter) {
 
-        $matchKeyword = $keyword === ''
-            || stripos($facility['name'], $keyword) !== false
-            || stripos($facility['address'], $keyword) !== false;
+        $matchKeyword = $keyword === ""
+            || stripos($facility["name"], $keyword) !== false
+            || stripos($facility["address"], $keyword) !== false;
 
-        $matchType = $typeFilter === ''
-            || $facility['type'] === $typeFilter;
+        $matchType = $typeFilter === ""
+            || $facility["type"] === $typeFilter;
 
         return $matchKeyword && $matchType;
     }
 );
 
-// HELPER
-function e($value)
-{
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
-}
-
-$totalFacilities = count($_SESSION['admin_facilities']);
+// RINGKASAN
+$totalFacilities = count($facilities);
 
 $totalPuskesmas = 0;
 $totalKlinik = 0;
 $totalHospital = 0;
 
-foreach ($_SESSION['admin_facilities'] as $facility) {
-    if ($facility['type'] === 'Puskesmas') {
+foreach ($facilities as $facility) {
+
+    if ($facility["type"] === "Puskesmas") {
         $totalPuskesmas++;
-    } elseif ($facility['type'] === 'Klinik') {
+
+    } elseif ($facility["type"] === "Klinik") {
         $totalKlinik++;
-    } elseif ($facility['type'] === 'Rumah sakit') {
+
+    } elseif ($facility["type"] === "Rumah sakit") {
         $totalHospital++;
     }
+}
+
+// HELPER
+function e($value)
+{
+    return htmlspecialchars((string) $value, ENT_QUOTES, "UTF-8");
 }
 
 ?>
@@ -225,11 +253,19 @@ foreach ($_SESSION['admin_facilities'] as $facility) {
 
 
             <!-- NOTIFICATION -->
-            <?php if (isset($_GET['deleted'])): ?>
+            <?php if ($successMessage !== ""): ?>
 
-            <div class="admin-facility-alert">
-                Fasilitas berhasil dihapus.
-            </div>
+                <div class="admin-facility-alert">
+                    <?= e($successMessage) ?>
+                </div>
+
+            <?php endif; ?>
+
+            <?php if ($errorMessage !== ""): ?>
+
+                <div class="admin-facility-alert">
+                    <?= e($errorMessage) ?>
+                </div>
 
             <?php endif; ?>
 
@@ -291,22 +327,27 @@ foreach ($_SESSION['admin_facilities'] as $facility) {
 
                     <div class="admin-facility-search-controls">
 
-                        <input type="text" id="searchFacility" name="search" placeholder="Nama fasilitas atau alamat"
-                            value="<?= e($keyword) ?>">
+                        <input
+                            type="text"
+                            id="searchFacility"
+                            name="search"
+                            placeholder="Nama fasilitas atau alamat"
+                            value="<?= e($keyword) ?>"
+                        >
 
                         <select name="type">
 
                             <option value="">Semua jenis</option>
 
-                            <option value="Puskesmas" <?= $typeFilter === 'Puskesmas' ? 'selected' : '' ?>>
+                            <option value="Puskesmas" <?= $typeFilter === "Puskesmas" ? "selected" : "" ?>>
                                 Puskesmas
                             </option>
 
-                            <option value="Klinik" <?= $typeFilter === 'Klinik' ? 'selected' : '' ?>>
+                            <option value="Klinik" <?= $typeFilter === "Klinik" ? "selected" : "" ?>>
                                 Klinik
                             </option>
 
-                            <option value="Rumah sakit" <?= $typeFilter === 'Rumah sakit' ? 'selected' : '' ?>>
+                            <option value="Rumah sakit" <?= $typeFilter === "Rumah sakit" ? "selected" : "" ?>>
                                 Rumah sakit
                             </option>
 
@@ -357,71 +398,90 @@ foreach ($_SESSION['admin_facilities'] as $facility) {
 
                             <?php if (count($filteredFacilities) > 0): ?>
 
-                            <?php foreach ($filteredFacilities as $facility): ?>
+                                <?php foreach ($filteredFacilities as $facility): ?>
 
-                            <tr>
+                                    <tr>
 
-                                <td class="facility-name-cell">
-                                    <?= e($facility['name']) ?>
-                                </td>
+                                        <td class="facility-name-cell">
+                                            <?= e($facility["name"]) ?>
+                                        </td>
 
-                                <td>
-                                    <span class="facility-type-badge">
-                                        <?= e($facility['type']) ?>
-                                    </span>
-                                </td>
+                                        <td>
+                                            <span class="facility-type-badge">
+                                                <?= e($facility["type"]) ?>
+                                            </span>
+                                        </td>
 
-                                <td class="facility-address-cell">
-                                    <?= e($facility['address']) ?>
-                                </td>
+                                        <td class="facility-address-cell">
+                                            <?= e($facility["address"]) ?>
+                                        </td>
 
-                                <td class="facility-contact-cell">
-                                    <?= e($facility['contact']) ?>
-                                </td>
+                                        <td class="facility-contact-cell">
+                                            <?= e($facility["contact"]) ?>
+                                        </td>
 
-                                <td>
-                                    <span class="facility-active-badge">
-                                        <?= e($facility['status']) ?>
-                                    </span>
-                                </td>
+                                        <td>
+                                            <span class="facility-active-badge">
+                                                <?= e($facility["status"]) ?>
+                                            </span>
+                                        </td>
 
-                                <td>
+                                        <td>
 
-                                    <div class="admin-facility-actions">
+                                            <div class="admin-facility-actions">
 
-                                        <a href="edit.php?id=<?= (int) $facility['id'] ?>" class="facility-edit-button">
-                                            Edit
-                                        </a>
+                                                <a
+                                                    href="edit.php?id=<?= (int) $facility["id"] ?>"
+                                                    class="facility-edit-button"
+                                                >
+                                                    Edit
+                                                </a>
 
-                                        <form action="index.php" method="POST"
-                                            onsubmit="return confirm('Yakin ingin menghapus fasilitas ini?')">
+                                                <form
+                                                    action="index.php"
+                                                    method="POST"
+                                                    onsubmit="return confirm('Yakin ingin menghapus fasilitas ini?')"
+                                                >
 
-                                            <input type="hidden" name="delete_id" value="<?= (int) $facility['id'] ?>">
+                                                    <input
+                                                        type="hidden"
+                                                        name="delete_id"
+                                                        value="<?= (int) $facility["id"] ?>"
+                                                    >
 
-                                            <button type="submit" class="facility-delete-button">
-                                                Hapus
-                                            </button>
+                                                    <input
+                                                        type="hidden"
+                                                        name="csrf_token"
+                                                        value="<?= e($_SESSION["csrf_token"]) ?>"
+                                                    >
 
-                                        </form>
+                                                    <button
+                                                        type="submit"
+                                                        class="facility-delete-button"
+                                                    >
+                                                        Hapus
+                                                    </button>
 
-                                    </div>
+                                                </form>
 
-                                </td>
+                                            </div>
 
-                            </tr>
+                                        </td>
 
-                            <?php endforeach; ?>
+                                    </tr>
+
+                                <?php endforeach; ?>
 
                             <?php else: ?>
 
-                            <tr>
+                                <tr>
 
-                                <td colspan="6" class="admin-facility-empty">
-                                    Fasilitas tidak ditemukan.
-                                    Coba kata kunci lain.
-                                </td>
+                                    <td colspan="6" class="admin-facility-empty">
+                                        Fasilitas tidak ditemukan.
+                                        Coba kata kunci lain.
+                                    </td>
 
-                            </tr>
+                                </tr>
 
                             <?php endif; ?>
 

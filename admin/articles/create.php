@@ -1,67 +1,157 @@
 <?php
-session_start();
 
-$adminName = $_SESSION['name']
-    ?? $_SESSION['username']
-    ?? 'Admin';
+$required_role = "admin";
+require_once __DIR__ . "/../../includes/auth-check.php";
+require_once __DIR__ . "/../../config/database.php";
 
-$successMessage = '';
-$errorMessage = '';
+$adminName = $_SESSION["name"]
+    ?? $_SESSION["username"]
+    ?? "Admin";
 
-$title = '';
-$category = '';
-$summary = '';
-$content = '';
-$status = 'Draf';
+$adminId = (int) $_SESSION["user_id"];
 
-// PROSES FORM
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+$successMessage = "";
+$errorMessage = "";
 
-    $title = trim($_POST['title'] ?? '');
-    $category = trim($_POST['category'] ?? '');
-    $summary = trim($_POST['summary'] ?? '');
-    $content = trim($_POST['content'] ?? '');
-    $status = ($_POST['action'] ?? 'draft') === 'publish'? 'Terbit': 'Draf';
+$title = "";
+$category = "";
+$summary = "";
+$content = "";
+$status = "Draf";
 
-    if (
-        $title === '' ||
-        $category === '' ||
-        $summary === '' ||
-        $content === ''
-    ) {
-        $errorMessage = 'Semua kolom wajib diisi sebelum menyimpan artikel.';
-    } else {
+// Token keamanan form
+if (empty($_SESSION["csrf_token"])) {
+    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+}
 
-        // SIMPAN SEMENTARA KE SESSION
-        if (!isset($_SESSION['articles'])) {
-            $_SESSION['articles'] = [];
-        }
+// Mengambil kategori dari database
+$categories = [];
 
-        $_SESSION['articles'][] = [
-            'id' => time(),
-            'title' => $title,
-            'category' => $category,
-            'summary' => $summary,
-            'content' => $content,
-            'status' => $status,
-            'author' => $adminName,
-            'updated' => date('d M Y')
-        ];
+$sqlCategories = "SELECT id, name FROM article_categories ORDER BY name ASC";
+$resultCategories = $conn->query($sqlCategories);
 
-        $_SESSION['article_success'] =
-            $status === 'Terbit'
-            ? 'Artikel berhasil diterbitkan!'
-            : 'Artikel berhasil disimpan sebagai draf!';
-
-        header('Location: index.php');
-        exit;
+if ($resultCategories) {
+    while ($row = $resultCategories->fetch_assoc()) {
+        $categories[] = $row;
     }
 }
 
+// PROSES FORM
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $title = trim($_POST["title"] ?? "");
+    $category = trim($_POST["category"] ?? "");
+    $summary = trim($_POST["summary"] ?? "");
+    $content = trim($_POST["content"] ?? "");
+
+    $action = $_POST["action"] ?? "draft";
+
+    $status = $action === "publish" ? "Terbit" : "Draf";
+
+    $csrfToken = $_POST["csrf_token"] ?? "";
+
+    if (
+        !hash_equals($_SESSION["csrf_token"], $csrfToken)
+    ) {
+        $errorMessage = "Permintaan tidak valid. Silakan muat ulang halaman.";
+    } elseif (
+        $title === "" ||
+        $category === "" ||
+        $summary === "" ||
+        $content === ""
+    ) {
+        $errorMessage = "Semua kolom wajib diisi sebelum menyimpan artikel.";
+    } elseif (!in_array($action, ["draft", "publish"], true)) {
+        $errorMessage = "Aksi penyimpanan tidak valid.";
+    } else {
+
+        // Memastikan kategori benar-benar tersedia
+        $categoryId = filter_var($category, FILTER_VALIDATE_INT);
+
+        $categoryExists = false;
+
+        if ($categoryId && $categoryId > 0) {
+            $checkCategory = $conn->prepare(
+                "SELECT id FROM article_categories WHERE id = ?"
+            );
+
+            if ($checkCategory) {
+                $checkCategory->bind_param("i", $categoryId);
+                $checkCategory->execute();
+                $checkCategory->store_result();
+
+                $categoryExists = $checkCategory->num_rows > 0;
+
+                $checkCategory->close();
+            }
+        }
+
+        if (!$categoryExists) {
+            $errorMessage = "Kategori artikel tidak valid.";
+        } else {
+
+            // Menentukan status database
+            $dbStatus = $action === "publish"
+                ? "published"
+                : "draft";
+
+            // Menyimpan artikel ke database
+            $sqlInsert = "INSERT INTO articles
+                            (category_id, author_id, title, excerpt, content, status)
+                          VALUES (?, ?, ?, ?, ?, ?)";
+
+            $stmt = $conn->prepare($sqlInsert);
+
+            if ($stmt) {
+
+                $stmt->bind_param(
+                    "iissss",
+                    $categoryId,
+                    $adminId,
+                    $title,
+                    $summary,
+                    $content,
+                    $dbStatus
+                );
+
+                if ($stmt->execute()) {
+
+                    $_SESSION["article_success"] =
+                        $dbStatus === "published"
+                        ? "Artikel berhasil diterbitkan!"
+                        : "Artikel berhasil disimpan sebagai draf!";
+
+                    // Membuat token baru
+                    $_SESSION["csrf_token"] = bin2hex(random_bytes(32));
+
+                    $stmt->close();
+
+                    header("Location: index.php");
+                    exit;
+
+                } else {
+                    $errorMessage = "Artikel gagal disimpan. Silakan coba kembali.";
+                }
+
+                $stmt->close();
+
+            } else {
+                $errorMessage = "Terjadi kesalahan saat menyiapkan penyimpanan artikel.";
+            }
+        }
+    }
+}
+
+// Mengamankan output HTML
 function e($value)
 {
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars(
+        (string) $value,
+        ENT_QUOTES,
+        "UTF-8"
+    );
 }
+
 ?>
 
 <!DOCTYPE html>
@@ -198,6 +288,11 @@ function e($value)
                 <section class="article-editor-card">
 
                     <form action="create.php" method="POST" id="articleForm">
+                        <input
+                            type="hidden"
+                            name="csrf_token"
+                            value="<?= e($_SESSION['csrf_token']) ?>"
+                        >
 
                         <!-- TITLE -->
                         <div class="article-form-group">
@@ -218,24 +313,21 @@ function e($value)
                             <label for="articleCategory">
                                 Kategori
                             </label>
-
+                            
                             <select id="articleCategory" name="category" required>
 
-                                <option value="">
-                                    Pilih kategori
-                                </option>
+                                <option value="">Pilih kategori</option>
 
-                                <option value="Kesehatan umum" <?= $category === 'Kesehatan umum' ? 'selected' : '' ?>>
-                                    Kesehatan umum
-                                </option>
+                                <?php foreach ($categories as $item): ?>
 
-                                <option value="Pola hidup" <?= $category === 'Pola hidup' ? 'selected' : '' ?>>
-                                    Pola hidup
-                                </option>
+                                    <option
+                                        value="<?= (int) $item["id"] ?>"
+                                        <?= $category == $item["id"] ? "selected" : "" ?>
+                                    >
+                                        <?= e($item["name"]) ?>
+                                    </option>
 
-                                <option value="Keluarga" <?= $category === 'Keluarga' ? 'selected' : '' ?>>
-                                    Keluarga
-                                </option>
+                                <?php endforeach; ?>
 
                             </select>
 

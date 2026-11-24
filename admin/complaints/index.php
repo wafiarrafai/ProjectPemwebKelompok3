@@ -1,46 +1,91 @@
 <?php
-session_start();
 
-$adminName = $_SESSION['name']
-    ?? $_SESSION['username']
-    ?? 'Admin';
+$required_role = "admin";
+require_once __DIR__ . "/../../includes/auth-check.php";
+require_once __DIR__ . "/../../config/database.php";
 
-// DATA KELUHAN CONTOH
-$complaints = [
-    [
-        'id' => 1,
-        'title' => 'Keluhan umum - Siti R.',
-        'user' => 'Siti R.',
-        'category' => 'Kesehatan umum',
-        'date' => '20 Nov 2026',
-        'status' => 'Menunggu',
-        'description' => 'Saya ingin mencatat keluhan kesehatan.'
-    ],
-    [
-        'id' => 2,
-        'title' => 'Informasi fasilitas - Budi A.',
-        'user' => 'Budi A.',
-        'category' => 'Direktori fasilitas',
-        'date' => '19 Nov 2026',
-        'status' => 'Diproses',
-        'description' => 'Saya membutuhkan informasi fasilitas kesehatan.'
-    ],
-    [
-        'id' => 3,
-        'title' => 'Keluhan umum - Rina P.',
-        'user' => 'Rina P.',
-        'category' => 'Kesehatan umum',
-        'date' => '18 Nov 2026',
-        'status' => 'Selesai',
-        'description' => 'Saya ingin mendapatkan informasi kesehatan.'
-    ]
-];
+$adminName = $_SESSION["name"]
+    ?? $_SESSION["username"]
+    ?? "Admin";
 
-// FILTER
-$keyword = trim($_GET['search'] ?? '');
-$statusFilter = $_GET['status'] ?? '';
-$categoryFilter = $_GET['category'] ?? '';
+// AMBIL DATA KELUHAN DARI DATABASE
+$complaints = [];
 
+$sql = "SELECT
+            c.id,
+            c.title,
+            u.name AS user_name,
+            cc.name AS category,
+            DATE_FORMAT(c.created_at, '%d %b %Y') AS date,
+            c.status,
+            c.description
+        FROM complaints c
+        JOIN users u
+            ON c.user_id = u.id
+        JOIN complaint_categories cc
+            ON c.category_id = cc.id
+        ORDER BY c.created_at DESC";
+
+$stmt = $conn->prepare($sql);
+
+if ($stmt) {
+    $stmt->execute();
+
+    $stmt->bind_result(
+        $complaintId,
+        $complaintTitle,
+        $complaintUser,
+        $complaintCategory,
+        $complaintDate,
+        $complaintStatus,
+        $complaintDescription
+    );
+
+    while ($stmt->fetch()) {
+        $complaints[] = [
+            "id" => $complaintId,
+            "title" => $complaintTitle,
+            "user" => $complaintUser,
+            "category" => $complaintCategory,
+            "date" => $complaintDate,
+            "status" => $complaintStatus,
+            "description" => $complaintDescription
+        ];
+    }
+
+    $stmt->close();
+}
+
+// AMBIL KATEGORI UNIK DARI DATA KELUHAN
+$categories = [];
+
+foreach ($complaints as $complaint) {
+    if (!in_array($complaint["category"], $categories, true)) {
+        $categories[] = $complaint["category"];
+    }
+}
+
+// FILTER PENCARIAN
+$keyword = trim($_GET["search"] ?? "");
+$statusFilter = $_GET["status"] ?? "";
+$categoryFilter = $_GET["category"] ?? "";
+
+// VALIDASI FILTER STATUS
+$allowedStatuses = ["", "Menunggu", "Diproses", "Selesai"];
+
+if (!in_array($statusFilter, $allowedStatuses, true)) {
+    $statusFilter = "";
+}
+
+// VALIDASI FILTER KATEGORI
+if (
+    $categoryFilter !== "" &&
+    !in_array($categoryFilter, $categories, true)
+) {
+    $categoryFilter = "";
+}
+
+// TERAPKAN FILTER
 $filteredComplaints = array_filter(
     $complaints,
     function ($complaint) use (
@@ -48,50 +93,50 @@ $filteredComplaints = array_filter(
         $statusFilter,
         $categoryFilter
     ) {
-        $matchKeyword = $keyword === ''
-            || stripos($complaint['title'], $keyword) !== false
-            || stripos($complaint['user'], $keyword) !== false;
+        $matchKeyword = $keyword === ""
+            || stripos($complaint["title"], $keyword) !== false
+            || stripos($complaint["user"], $keyword) !== false;
 
-        $matchStatus = $statusFilter === ''
-            || $complaint['status'] === $statusFilter;
+        $matchStatus = $statusFilter === ""
+            || $complaint["status"] === $statusFilter;
 
-        $matchCategory = $categoryFilter === ''
-            || $complaint['category'] === $categoryFilter;
+        $matchCategory = $categoryFilter === ""
+            || $complaint["category"] === $categoryFilter;
 
         return $matchKeyword && $matchStatus && $matchCategory;
     }
 );
 
 // DOWNLOAD DATA CSV
-if (isset($_GET['download'])) {
+if (isset($_GET["download"])) {
 
-    header('Content-Type: text/csv; charset=UTF-8');
+    header("Content-Type: text/csv; charset=UTF-8");
     header('Content-Disposition: attachment; filename="data-keluhan-sehatin.csv"');
 
-    $output = fopen('php://output', 'w');
+    $output = fopen("php://output", "w");
 
     // BOM agar karakter Indonesia terbaca di Excel
     fprintf($output, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
     fputcsv($output, [
-        'ID',
-        'Judul Keluhan',
-        'Nama Pengguna',
-        'Kategori',
-        'Tanggal',
-        'Status',
-        'Deskripsi'
+        "ID",
+        "Judul Keluhan",
+        "Nama Pengguna",
+        "Kategori",
+        "Tanggal",
+        "Status",
+        "Deskripsi"
     ]);
 
     foreach ($filteredComplaints as $complaint) {
         fputcsv($output, [
-            $complaint['id'],
-            $complaint['title'],
-            $complaint['user'],
-            $complaint['category'],
-            $complaint['date'],
-            $complaint['status'],
-            $complaint['description']
+            $complaint["id"],
+            $complaint["title"],
+            $complaint["user"],
+            $complaint["category"],
+            $complaint["date"],
+            $complaint["status"],
+            $complaint["description"]
         ]);
     }
 
@@ -102,13 +147,17 @@ if (isset($_GET['download'])) {
 // HELPER
 function e($value)
 {
-    return htmlspecialchars($value, ENT_QUOTES, 'UTF-8');
+    return htmlspecialchars(
+        (string) $value,
+        ENT_QUOTES,
+        "UTF-8"
+    );
 }
 
 // URL DOWNLOAD MEMPERTAHANKAN FILTER
 $downloadParams = $_GET;
-$downloadParams['download'] = '1';
-$downloadUrl = 'index.php?' . http_build_query($downloadParams);
+$downloadParams["download"] = "1";
+$downloadUrl = "index.php?" . http_build_query($downloadParams);
 ?>
 
 <!DOCTYPE html>
@@ -245,20 +294,19 @@ $downloadUrl = 'index.php?' . http_build_query($downloadParams);
 
                         </select>
 
-
+                        
                         <select name="category">
 
-                            <option value="">Kategori</option>
+                            <option value="">Semua kategori</option>
 
-                            <option value="Kesehatan umum"
-                                <?= $categoryFilter === 'Kesehatan umum' ? 'selected' : '' ?>>
-                                Kesehatan umum
-                            </option>
+                            <?php foreach ($categories as $category): ?>
 
-                            <option value="Direktori fasilitas"
-                                <?= $categoryFilter === 'Direktori fasilitas' ? 'selected' : '' ?>>
-                                Direktori fasilitas
-                            </option>
+                                <option value="<?= e($category) ?>"
+                                    <?= $categoryFilter === $category ? "selected" : "" ?>>
+                                    <?= e($category) ?>
+                                </option>
+
+                            <?php endforeach; ?>
 
                         </select>
 
