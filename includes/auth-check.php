@@ -10,8 +10,19 @@ header("Cache-Control: no-store, no-cache, must-revalidate, max-age=0");
 header("Pragma: no-cache");
 header("Expires: 0");
 
-// Alamat dasar proyek
-$baseUrl = "/ProjectPemwebKelompok3";
+// Ambil alamat dasar dari URL halaman yang sedang dibuka agar project tetap
+// bekerja di alias Apache mana pun (misalnya /sehatin atau /ProjectPemwebKelompok3).
+$scriptPath = str_replace("\\", "/", $_SERVER["SCRIPT_NAME"] ?? "");
+$baseUrl = "";
+
+foreach (["/user/", "/admin/"] as $areaPath) {
+    $areaPosition = strpos($scriptPath, $areaPath);
+
+    if ($areaPosition !== false) {
+        $baseUrl = substr($scriptPath, 0, $areaPosition);
+        break;
+    }
+}
 
 // Memeriksa apakah pengguna sudah login
 if (empty($_SESSION["user_id"])) {

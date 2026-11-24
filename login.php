@@ -92,7 +92,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/auth.css">
+    <link rel="stylesheet" href="assets/css/auth.css?v=<?= filemtime(__DIR__ . '/assets/css/auth.css') ?>">
+    <script src="assets/js/auth-motion.js?v=<?= filemtime(__DIR__ . '/assets/js/auth-motion.js') ?>" defer></script>
 </head>
 
 <body class="auth-body">
@@ -207,6 +208,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         </button>
 
                     </form>
+
+                    <aside class="demo-accounts" aria-label="Kredensial akun demo">
+                        <div class="demo-accounts-heading">
+                            <h3>Akun demo praktikum</h3>
+                            <span>Untuk mencoba fitur</span>
+                        </div>
+
+                        <div class="demo-accounts-list">
+                            <section class="demo-account">
+                                <h4>Admin</h4>
+                                <dl class="demo-account-details">
+                                    <div>
+                                        <dt>Email</dt>
+                                        <dd><code>admin@gmail.com</code></dd>
+                                    </div>
+                                    <div>
+                                        <dt>Kata sandi</dt>
+                                        <dd><code>admin1234</code></dd>
+                                    </div>
+                                </dl>
+                            </section>
+
+                            <section class="demo-account">
+                                <h4>Pengguna</h4>
+                                <dl class="demo-account-details">
+                                    <div>
+                                        <dt>Email</dt>
+                                        <dd><code>user@gmail.com</code></dd>
+                                    </div>
+                                    <div>
+                                        <dt>Kata sandi</dt>
+                                        <dd><code>user1234</code></dd>
+                                    </div>
+                                </dl>
+                            </section>
+                        </div>
+                    </aside>
 
 
                     <!-- REGISTER LINK -->

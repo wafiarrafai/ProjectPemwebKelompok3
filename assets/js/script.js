@@ -1,7 +1,14 @@
 document.addEventListener("DOMContentLoaded", function () {
+  if (document.body.classList.contains("home-body")) {
+    document.body.classList.add("home-motion-ready");
+  }
+
   const cards = document.querySelectorAll(".article-card, .quick-card");
 
   if (!("IntersectionObserver" in window)) {
+    cards.forEach(function (card) {
+      card.classList.add("is-visible");
+    });
     return;
   }
 

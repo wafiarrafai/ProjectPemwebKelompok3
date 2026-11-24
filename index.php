@@ -63,11 +63,11 @@ if ($resultArticles) {
 
     <link rel="stylesheet" href="assets/css/reset.css">
     <link rel="stylesheet" href="assets/css/style.css">
-    <link rel="stylesheet" href="assets/css/home.css">
-    <script src="assets/js/script.js" defer></script>
+    <link rel="stylesheet" href="assets/css/home.css?v=<?= filemtime(__DIR__ . '/assets/css/home.css') ?>">
+    <script src="assets/js/script.js?v=<?= filemtime(__DIR__ . '/assets/js/script.js') ?>" defer></script>
 </head>
 
-<body>
+<body class="home-body">
 
     <header class="home-header">
         <div class="home-header-inner">
@@ -140,30 +140,19 @@ if ($resultArticles) {
                 </p>
             </div>
 
-            <!-- HERO ILLUSTRATION -->
+            <!-- HERO PHOTO -->
             <div class="hero-visual">
+                <img
+                    class="hero-photo"
+                    src="assets/images/sehatin-hero.webp"
+                    alt="Dokter dan pasien berbincang di ruang konsultasi yang nyaman"
+                    fetchpriority="high"
+                    decoding="async">
 
-                <div class="circle circle-coral"></div>
-                <div class="circle circle-yellow"></div>
-
-                <div class="info-card">
-                    <span>MULAI DARI INFORMASI</span>
-
-                    <h2>
-                        Cari tahu hal yang bisa kamu lakukan hari ini.
-                    </h2>
-
-                    <p>
-                        Artikel, fasilitas, dan catatan keluhan
-                        dalam satu alur.
-                    </p>
+                <div class="hero-photo-caption">
+                    <span>INFORMASI KESEHATAN UNTUK SEMUA</span>
+                    <strong>Temukan informasi yang kamu butuhkan.</strong>
                 </div>
-
-                <div class="facility-card">
-                    <span>DIREKTORI FASILITAS</span>
-                    <strong>Info penting tersusun rapi</strong>
-                </div>
-
             </div>
 
         </section>
