@@ -71,13 +71,13 @@ Proyek ini mendukung **SDG 3: Kehidupan Sehat dan Sejahtera**.
 
    | Peran | Email / Username | Password |
    |-------|------------------|----------|
-   | Admin | `[admin@gmail].com` | `admin1234` |
-   | User  | `[user@gmail.com]` | `[user1234]` |
+   | Admin | `admin@gmail.com` | `admin1234` |
+   | User  | `user@gmail.com` | `user1234` |
 
 ## Tim Pengembang (Kelompok 3)
 
 | Nama | NIM |
 |------|-----|
-| `Aqil Fachri Al Habsyi` | `[H1D025053]` |
-| `[Awal Ramadhan Depa]` | `[H1D025057]` |
-| `[Wafi Abdul Wahid Ar Rafai]` | `[H1D025072]` |
+| `Aqil Fachri Al Habsyi` | `H1D025053` |
+| `Awal Ramadhan Depa` | `H1D025057` |
+| `Wafi Abdul Wahid Ar Rafai` | `H1D025072` |
