@@ -52,14 +52,14 @@ Proyek ini mendukung **SDG 3: Kehidupan Sehat dan Sejahtera**.
    git clone https://github.com/wafiarrafai/ProjectPemwebKelompok3.git
    ```
 2. Jalankan **Apache** dan **MySQL** dari XAMPP Control Panel.
-3. Buka `http://localhost/phpmyadmin`, lalu buat database baru bernama `[nama_database]`.
-4. Pilih database tersebut, buka tab **Import**, lalu pilih berkas SQL di folder `database/` (`[nama_file.sql]`) dan klik **Go**.
-5. Buka berkas konfigurasi di folder `config/` (`[nama_file_config.php]`), lalu sesuaikan dengan pengaturan MySQL kamu:
+3. Buka `http://localhost/phpmyadmin`, lalu buat database baru bernama `sehatin_db`.
+4. Pilih database tersebut, buka tab **Import**, lalu pilih berkas SQL di folder `database/` (`database.sql`) dan klik **Go**.
+5. Buka berkas konfigurasi di folder `config/` (`database.php`), lalu sesuaikan dengan pengaturan MySQL kamu:
    ```php
    $host = "localhost";
    $user = "root";
    $pass = "";
-   $db   = "[nama_database]";
+   $db   = "sehatin_db";
    ```
 
 ## Panduan Menjalankan Aplikasi
