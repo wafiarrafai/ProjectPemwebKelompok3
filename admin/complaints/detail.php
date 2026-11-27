@@ -159,6 +159,25 @@ function e($value)
     );
 }
 
+$statusStyles = [
+    "Menunggu" => "waiting",
+    "Diproses" => "processing",
+    "Selesai" => "completed",
+];
+
+$formStatus = $complaint["status"] ?? "Menunggu";
+$formAdminNote = $complaint["admin_note"] ?? "";
+
+if ($_SERVER["REQUEST_METHOD"] === "POST" && $error !== "") {
+    $submittedStatus = $_POST["status"] ?? "";
+
+    if (is_string($submittedStatus) && isset($statusStyles[$submittedStatus])) {
+        $formStatus = $submittedStatus;
+    }
+
+    $formAdminNote = trim($_POST["admin_note"] ?? "");
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="id">
@@ -171,144 +190,144 @@ function e($value)
 
     <link rel="stylesheet" href="../../assets/css/reset.css">
     <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="../../assets/css/admin-dashboard.css">
+    <link rel="stylesheet" href="../../assets/css/admin-complaints.css">
+    <link rel="stylesheet" href="../../assets/css/admin-complaint-detail.css?v=<?= filemtime(__DIR__ . '/../../assets/css/admin-complaint-detail.css') ?>">
 </head>
 
-<body>
+<body class="admin-dashboard-page">
+    <div class="admin-layout">
+        <aside class="admin-sidebar">
+            <a href="../dashboard.php" class="admin-brand">
+                <span class="admin-brand-icon">S</span>
+                <span>sehatin</span>
+            </a>
 
-    <main style="max-width: 850px; margin: 40px auto; padding: 20px;">
+            <div class="admin-menu">
+                <p class="admin-menu-label">PENGELOLAAN</p>
+                <nav class="admin-nav" aria-label="Navigasi admin">
+                    <a href="../dashboard.php" class="admin-nav-link"><span>●</span>Dashboard</a>
+                    <a href="../articles/index.php" class="admin-nav-link"><span>▤</span>Artikel</a>
+                    <a href="../categories/index.php" class="admin-nav-link"><span>▦</span>Kategori</a>
+                    <a href="../facilities/index.php" class="admin-nav-link"><span>＋</span>Fasilitas</a>
+                    <a href="index.php" class="admin-nav-link active" aria-current="page"><span>▣</span>Keluhan</a>
+                    <a href="../users/index.php" class="admin-nav-link"><span>♙</span>Pengguna</a>
+                </nav>
+            </div>
 
-        <a href="index.php">← Kembali ke daftar keluhan</a>
+            <div class="admin-sidebar-bottom">
+                <p><?= e($adminName) ?> · Admin</p>
+                <a href="../../logout.php">Keluar dari akun</a>
+            </div>
+        </aside>
 
-        <h1>Detail Keluhan</h1>
+        <main class="admin-main admin-complaints-main complaint-detail-main">
+            <header class="complaint-detail-header">
+                <div>
+                    <a href="index.php" class="complaint-back-link">← Kembali ke daftar keluhan</a>
+                    <span class="complaint-detail-eyebrow">TINJAUAN KELUHAN</span>
+                    <h1>Detail keluhan</h1>
+                    <p>Periksa informasi yang dikirim pengguna dan catat tindak lanjutnya.</p>
+                </div>
+            </header>
 
-        <?php if ($success): ?>
-            <p style="color: green;">
-                <?= e($success) ?>
-            </p>
-        <?php endif; ?>
+            <?php if ($success): ?>
+                <div class="complaint-feedback success" role="status"><?= e($success) ?></div>
+            <?php endif; ?>
 
-        <?php if ($error): ?>
-            <p style="color: red;">
-                <?= e($error) ?>
-            </p>
-        <?php endif; ?>
+            <?php if ($error): ?>
+                <div class="complaint-feedback error" role="alert"><?= e($error) ?></div>
+            <?php endif; ?>
 
-        <?php if (!$complaint): ?>
+            <?php if (!$complaint): ?>
+                <section class="complaint-panel complaint-not-found">
+                    <span class="complaint-not-found-icon" aria-hidden="true">!</span>
+                    <h2>Keluhan tidak ditemukan</h2>
+                    <p>Keluhan mungkin sudah dihapus atau tautannya tidak valid.</p>
+                    <a href="index.php" class="complaint-primary-button">Kembali ke daftar keluhan</a>
+                </section>
+            <?php else: ?>
+                <div class="complaint-detail-grid">
+                    <section class="complaint-panel complaint-summary-panel" aria-labelledby="complaint-title">
+                        <div class="complaint-summary-heading">
+                            <div>
+                                <span class="complaint-record-id">Keluhan #<?= (int) $complaint["id"] ?></span>
+                                <h2 id="complaint-title"><?= e($complaint["title"]) ?></h2>
+                            </div>
+                            <span class="complaint-detail-status <?= e($statusStyles[$complaint["status"]] ?? "waiting") ?>">
+                                <?= e($complaint["status"]) ?>
+                            </span>
+                        </div>
 
-            <h2>Keluhan tidak ditemukan.</h2>
+                        <dl class="complaint-meta-grid">
+                            <div>
+                                <dt>Kategori</dt>
+                                <dd><?= e($complaint["category"]) ?></dd>
+                            </div>
+                            <div>
+                                <dt>Dikirim pada</dt>
+                                <dd><?= e($complaint["date"]) ?></dd>
+                            </div>
+                        </dl>
 
-        <?php else: ?>
+                        <div class="complaint-description-block">
+                            <h3>Deskripsi keluhan</h3>
+                            <p><?= nl2br(e($complaint["description"])) ?></p>
+                        </div>
+                    </section>
 
-            <section style="margin-top: 25px;">
+                    <aside class="complaint-panel complaint-reporter-panel">
+                        <span class="complaint-panel-kicker">INFORMASI PELAPOR</span>
+                        <div class="complaint-reporter-avatar" aria-hidden="true">P</div>
+                        <h2><?= e($complaint["user_name"]) ?></h2>
+                        <p>Pengguna SEHATIN</p>
+                        <a href="mailto:<?= e($complaint["user_email"]) ?>" class="complaint-reporter-email">
+                            <?= e($complaint["user_email"]) ?>
+                        </a>
+                    </aside>
+                </div>
 
-                <h2><?= e($complaint["title"]) ?></h2>
-
-                <p>
-                    <strong>Nama pengguna:</strong>
-                    <?= e($complaint["user_name"]) ?>
-                </p>
-
-                <p>
-                    <strong>Email:</strong>
-                    <?= e($complaint["user_email"]) ?>
-                </p>
-
-                <p>
-                    <strong>Kategori:</strong>
-                    <?= e($complaint["category"]) ?>
-                </p>
-
-                <p>
-                    <strong>Tanggal:</strong>
-                    <?= e($complaint["date"]) ?>
-                </p>
-
-                <p>
-                    <strong>Deskripsi keluhan:</strong>
-                </p>
-
-                <p><?= nl2br(e($complaint["description"])) ?></p>
-
-            </section>
-
-            <hr style="margin: 25px 0;">
-
-            <section>
-
-                <h2>Tindak Lanjut Admin</h2>
-
-                <form method="POST">
-
-                    <input
-                        type="hidden"
-                        name="csrf_token"
-                        value="<?= e($csrfToken) ?>"
-                    >
-
-                    <div style="margin: 15px 0;">
-
-                        <label for="status">
-                            Status Keluhan
-                        </label>
-
-                        <select
-                            name="status"
-                            id="status"
-                            required
-                        >
-
-                            <?php
-                            $statuses = [
-                                "Menunggu",
-                                "Diproses",
-                                "Selesai"
-                            ];
-                            ?>
-
-                            <?php foreach ($statuses as $status): ?>
-
-                                <option
-                                    value="<?= e($status) ?>"
-                                    <?= $complaint["status"] === $status
-                                        ? "selected"
-                                        : "" ?>
-                                >
-                                    <?= e($status) ?>
-                                </option>
-
-                            <?php endforeach; ?>
-
-                        </select>
-
+                <section class="complaint-panel complaint-followup-panel">
+                    <div class="complaint-followup-heading">
+                        <div>
+                            <span class="complaint-panel-kicker">TINDAK LANJUT</span>
+                            <h2>Tindak lanjut admin</h2>
+                            <p>Perbarui status dan tambahkan catatan untuk riwayat keluhan ini.</p>
+                        </div>
                     </div>
 
-                    <div style="margin: 15px 0;">
+                    <form method="POST" class="complaint-followup-form">
+                        <input type="hidden" name="csrf_token" value="<?= e($csrfToken) ?>">
 
-                        <label for="admin_note">
-                            Catatan Tindak Lanjut
-                        </label>
+                        <div class="complaint-form-field complaint-status-field">
+                            <label for="status">Status keluhan</label>
+                            <select name="status" id="status" required>
+                                <?php foreach (["Menunggu", "Diproses", "Selesai"] as $status): ?>
+                                    <option value="<?= e($status) ?>" <?= $formStatus === $status ? "selected" : "" ?>>
+                                        <?= e($status) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </div>
 
-                        <textarea
-                            name="admin_note"
-                            id="admin_note"
-                            rows="5"
-                            style="width: 100%;"
-                            placeholder="Tuliskan catatan tindak lanjut..."
-                        ><?= e($complaint["admin_note"] ?? "") ?></textarea>
+                        <div class="complaint-form-field">
+                            <label for="admin_note">Catatan tindak lanjut <span>(opsional)</span></label>
+                            <textarea name="admin_note" id="admin_note" rows="5" placeholder="Tuliskan catatan tindak lanjut..."><?= e($formAdminNote) ?></textarea>
+                            <small>Hindari mencantumkan informasi sensitif yang tidak diperlukan.</small>
+                        </div>
 
-                    </div>
+                        <div class="complaint-form-actions">
+                            <a href="index.php" class="complaint-secondary-button">Batal</a>
+                            <button type="submit" class="complaint-primary-button">Simpan perubahan</button>
+                        </div>
+                    </form>
+                </section>
+            <?php endif; ?>
 
-                    <button type="submit">
-                        Simpan Perubahan
-                    </button>
-
-                </form>
-
-            </section>
-
-        <?php endif; ?>
-
-    </main>
-
+            <footer class="admin-footer">
+                <p>© 2026 SEHATIN. Admin Dashboard.</p>
+            </footer>
+        </main>
+    </div>
 </body>
 </html>
