@@ -389,6 +389,21 @@ a {
     gap: 24px;
 }
 
+.article-empty-state {
+    grid-column: 1 / -1;
+    padding: 28px;
+    border: 1px dashed var(--border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.72);
+    color: var(--text);
+}
+
+.article-empty-state p {
+    margin-top: 5px;
+    color: var(--muted);
+    font-size: 13px;
+}
+
 .article-card {
     overflow: hidden;
     padding: 16px;

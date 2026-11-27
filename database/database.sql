@@ -1,9 +1,4 @@
 
-CREATE DATABASE IF NOT EXISTS sehatin_db
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
-
-USE sehatin_db;
 
 -- 1. Tabel users
 CREATE TABLE IF NOT EXISTS users (
@@ -89,7 +84,7 @@ CREATE TABLE IF NOT EXISTS complaints (
         ON UPDATE CASCADE ON DELETE RESTRICT
 );
 
---Untuk isi kategori keluhan
+-- Untuk isi kategori keluhan
 INSERT IGNORE INTO complaint_categories (name)
 VALUES
 ('Kesehatan umum'),
@@ -97,7 +92,7 @@ VALUES
 ('Kesehatan mental'),
 ('Lainnya');
 
---Untuk isi kategori artikel
+-- Untuk isi kategori artikel
 INSERT IGNORE INTO article_categories (name)
 VALUES
     ('Kesehatan Umum'),

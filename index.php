@@ -176,6 +176,15 @@ if ($resultArticles) {
 
             <div class="article-grid">
 
+                <?php if (empty($articles)): ?>
+
+                <div class="article-empty-state">
+                    <strong>Belum ada artikel yang diterbitkan.</strong>
+                    <p>Silakan kembali lagi nanti untuk melihat bacaan pilihan.</p>
+                </div>
+
+                <?php else: ?>
+
                 <?php foreach ($articles as $index => $article): ?>
 
                 <article class="article-card">
@@ -214,6 +223,8 @@ if ($resultArticles) {
                 </article>
 
                 <?php endforeach; ?>
+
+                <?php endif; ?>
 
             </div>
 

@@ -94,6 +94,7 @@ function e($value)
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/admin-dashboard.css">
     <link rel="stylesheet" href="../../assets/css/admin-categories.css">
+    <link rel="stylesheet" href="../../assets/css/admin-record-forms.css?v=<?= filemtime(__DIR__ . '/../../assets/css/admin-record-forms.css') ?>">
 </head>
 
 <body class="admin-dashboard-page">
@@ -161,31 +162,29 @@ function e($value)
         </aside>
 
         <!-- MAIN CONTENT -->
-        <main class="admin-main admin-categories-main">
-
-            <header class="categories-header">
-
-                <div>
-                    <h1>Tambah kategori</h1>
-
-                    <p>
-                        Tambahkan kategori baru untuk mengelompokkan artikel kesehatan.
-                    </p>
-                </div>
-
+        <main class="admin-main admin-categories-main admin-form-page">
+            <header class="admin-form-page-header">
+                <a href="index.php" class="admin-form-back">← Kembali ke daftar kategori</a>
+                <span class="admin-form-kicker">PENGELOLAAN KATEGORI</span>
+                <h1>Tambah kategori</h1>
+                <p>Tambahkan kategori baru untuk mengelompokkan artikel kesehatan.</p>
             </header>
 
             <?php if ($errorMessage !== ""): ?>
 
-                <div class="categories-alert">
+                <div class="categories-alert admin-form-alert" role="alert">
                     <?= e($errorMessage) ?>
                 </div>
 
             <?php endif; ?>
 
-            <section class="categories-table-card">
+            <section class="admin-form-panel category-form-panel">
+                <div class="admin-form-panel-heading">
+                    <h2>Informasi kategori</h2>
+                    <p>Nama kategori akan digunakan sebagai label pada artikel.</p>
+                </div>
 
-                <form method="POST" action="create.php">
+                <form method="POST" action="create.php" class="admin-record-form category-record-form">
 
                     <input
                         type="hidden"
@@ -193,7 +192,7 @@ function e($value)
                         value="<?= e($_SESSION["csrf_token"]) ?>"
                     >
 
-                    <div>
+                    <div class="admin-form-field category-name-field">
                         <label for="name">Nama kategori</label>
 
                         <input
@@ -207,14 +206,9 @@ function e($value)
                         >
                     </div>
 
-                    <div>
-                        <button type="submit">
-                            Simpan kategori
-                        </button>
-
-                        <a href="index.php">
-                            Batal
-                        </a>
+                    <div class="admin-form-actions">
+                        <a href="index.php" class="admin-form-cancel">Batal</a>
+                        <button type="submit" class="admin-form-submit">Simpan kategori</button>
                     </div>
 
                 </form>

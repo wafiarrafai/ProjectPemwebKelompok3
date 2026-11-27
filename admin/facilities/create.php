@@ -116,6 +116,7 @@ function e($value)
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/admin-dashboard.css">
     <link rel="stylesheet" href="../../assets/css/admin-facilities.css">
+    <link rel="stylesheet" href="../../assets/css/admin-record-forms.css?v=<?= filemtime(__DIR__ . '/../../assets/css/admin-record-forms.css') ?>">
 </head>
 
 <body class="admin-dashboard-page">
@@ -178,22 +179,25 @@ function e($value)
         </aside>
 
         <!-- MAIN CONTENT -->
-        <main class="admin-main">
-
-            <header>
+        <main class="admin-main admin-facility-form-page admin-form-page">
+            <header class="admin-form-page-header">
+                <a href="index.php" class="admin-form-back">← Kembali ke daftar fasilitas</a>
+                <span class="admin-form-kicker">DIREKTORI FASILITAS</span>
                 <h1>Tambah fasilitas</h1>
                 <p>Masukkan informasi fasilitas kesehatan baru.</p>
             </header>
 
-            <section>
-
-                <a href="index.php">← Kembali ke daftar fasilitas</a>
+            <section class="admin-form-panel facility-form-panel">
+                <div class="admin-form-panel-heading">
+                    <h2>Informasi fasilitas</h2>
+                    <p>Isi detail fasilitas agar mudah ditemukan oleh pengguna.</p>
+                </div>
 
                 <?php if ($errorMessage !== ""): ?>
-                    <p role="alert"><?= e($errorMessage) ?></p>
+                    <div class="admin-form-alert" role="alert"><?= e($errorMessage) ?></div>
                 <?php endif; ?>
 
-                <form action="create.php" method="POST">
+                <form action="create.php" method="POST" class="admin-record-form facility-record-form">
 
                     <input
                         type="hidden"
@@ -201,7 +205,7 @@ function e($value)
                         value="<?= e($_SESSION["csrf_token"]) ?>"
                     >
 
-                    <div>
+                    <div class="admin-form-field">
                         <label for="name">Nama fasilitas</label>
                         <input
                             type="text"
@@ -213,7 +217,7 @@ function e($value)
                         >
                     </div>
 
-                    <div>
+                    <div class="admin-form-field">
                         <label for="type">Jenis fasilitas</label>
                         <select id="type" name="type" required>
                             <option value="">Pilih jenis fasilitas</option>
@@ -230,7 +234,7 @@ function e($value)
                         </select>
                     </div>
 
-                    <div>
+                    <div class="admin-form-field full-width">
                         <label for="address">Alamat</label>
                         <textarea
                             id="address"
@@ -241,7 +245,7 @@ function e($value)
                         ><?= e($address) ?></textarea>
                     </div>
 
-                    <div>
+                    <div class="admin-form-field">
                         <label for="phone">Nomor telepon</label>
                         <input
                             type="text"
@@ -252,7 +256,7 @@ function e($value)
                         >
                     </div>
 
-                    <div>
+                    <div class="admin-form-field full-width">
                         <label for="description">Deskripsi</label>
                         <textarea
                             id="description"
@@ -263,15 +267,18 @@ function e($value)
                         ><?= e($description) ?></textarea>
                     </div>
 
-                    <button type="submit">
-                        Simpan fasilitas
-                    </button>
-
-                    <a href="index.php">Batal</a>
+                    <div class="admin-form-actions">
+                        <a href="index.php" class="admin-form-cancel">Batal</a>
+                        <button type="submit" class="admin-form-submit">Simpan fasilitas</button>
+                    </div>
 
                 </form>
 
             </section>
+
+            <footer class="admin-footer">
+                <p>© 2026 SEHATIN. Admin Dashboard.</p>
+            </footer>
 
         </main>
 
